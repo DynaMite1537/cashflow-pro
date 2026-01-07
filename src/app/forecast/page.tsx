@@ -1,0 +1,74 @@
+'use client';
+
+import { useSimulation, useSimulationStats } from '@/hooks/useSimulation';
+import { formatCurrency } from '@/lib/dateUtils';
+import { RealityAnchor } from '@/components/dashboard/RealityAnchor';
+import { QuickAddWidget } from '@/components/dashboard/QuickAddWidget';
+import { HistoryControls } from '@/components/ui/HistoryControls';
+import { BalanceChart } from '@/components/dashboard/BalanceChart';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+
+export default function ForecastPage() {
+  const { simulation } = useSimulation();
+  const stats = useSimulationStats();
+  
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts();
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Financial Forecast</h1>
+          <p className="text-muted-foreground mt-1">90-day projection</p>
+        </div>
+      </div>
+
+      {/* Top Section with RealityAnchor and QuickAdd */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="md:col-span-2">
+          <RealityAnchor />
+        </div>
+        <div>
+          <QuickAddWidget />
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-sm text-muted-foreground mb-1">Total Income</p>
+          <p className="text-2xl font-bold text-emerald-600">{formatCurrency(stats.totalIncome)}</p>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-sm text-muted-foreground mb-1">Total Expenses</p>
+          <p className="text-2xl font-bold text-destructive">{formatCurrency(stats.totalExpenses)}</p>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-sm text-muted-foreground mb-1">Final Balance</p>
+          <p className={`text-2xl font-bold ${stats.finalBalance >= 0 ? 'text-foreground' : 'text-destructive'}`}>
+            {formatCurrency(stats.finalBalance)}
+          </p>
+        </div>
+      </div>
+
+      {/* Chart - Recharts */}
+      <div className="bg-card border border-border rounded-xl p-8 mb-8">
+        <h2 className="text-xl font-bold mb-6">Balance Projection</h2>
+        <BalanceChart data={simulation} />
+      </div>
+
+      {/* Transactions Placeholder */}
+      <div className="bg-card border border-border rounded-xl p-8">
+        <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
+        <div className="text-center text-muted-foreground py-8">
+          <p className="text-sm">Transaction list will be added here</p>
+        </div>
+      </div>
+
+      {/* History Controls */}
+      <HistoryControls />
+    </div>
+  );
+}

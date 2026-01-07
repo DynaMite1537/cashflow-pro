@@ -1,0 +1,41 @@
+{
+  "name": "cashflow-pro",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "analyze": "ANALYZE=true npm run build"
+  },
+  "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.9.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@tanstack/react-query": "^5.90.16",
+    "clsx": "^2.1.0",
+    "dayjs": "^1.11.19",
+    "lucide-react": "^0.446.0",
+    "next": "^16.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.0",
+    "tailwind-merge": "^2.5.0",
+    "use-debounce": "^10.0.0",
+    "zod": "^3.23.0",
+    "zundo": "^2.1.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.1",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^16.1.1",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.6.0"
+  }
+}
