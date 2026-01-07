@@ -2,16 +2,27 @@
 
 import { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus } from 'lucide-react';
-import { useBudgetStore, useTransactions } from '@/store/useBudgetStore';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, DollarSign } from 'lucide-react';
+import { useBudgetStore } from '@/store/useBudgetStore';
+import { matchesRecurrence } from '@/lib/dateUtils';
 import { cn } from '@/lib/utils';
+import { BudgetRule } from '@/types';
+
+interface CalendarEvent {
+  type: 'transaction' | 'rule';
+  name: string;
+  amount: number;
+  transactionType: 'income' | 'expense';
+  id: string;
+}
 
 export default function CalendarPage() {
-  const transactions = useTransactions();
+  const { transactions, rules } = useBudgetStore();
   const [currentDate, setCurrentDate] = useState(new Date());
-  
+
   const monthStart = dayjs(currentDate).startOf('month').toDate();
   const monthEnd = dayjs(currentDate).endOf('month').toDate();
+
   const daysInMonth = useMemo(() => {
     const days = [];
     let day = new Date(monthStart);
@@ -22,11 +33,40 @@ export default function CalendarPage() {
     return days;
   }, [monthStart, monthEnd]);
 
-  const getTransactionsForDate = (date: Date) => {
-    return transactions.filter(t => {
+  // Get all events for a specific date (one-time transactions + recurring rules)
+  const getEventsForDate = (date: Date): CalendarEvent[] => {
+    const events: CalendarEvent[] = [];
+
+    // Add one-time transactions
+    const dayTransactions = transactions.filter(t => {
       const tDate = new Date(t.date);
       return dayjs(date).isSame(tDate, 'month') && date.getDate() === tDate.getDate();
     });
+
+    dayTransactions.forEach(t => {
+      events.push({
+        type: 'transaction',
+        name: t.description || 'Transaction',
+        amount: t.amount,
+        transactionType: t.type,
+        id: t.id,
+      });
+    });
+
+    // Add matching recurring rules (only active)
+    const matchingRules = rules.filter(rule => rule.is_active && matchesRecurrence(date, rule));
+
+    matchingRules.forEach(rule => {
+      events.push({
+        type: 'rule',
+        name: rule.name,
+        amount: rule.amount,
+        transactionType: rule.type,
+        id: rule.id,
+      });
+    });
+
+    return events;
   };
 
   const goToPreviousMonth = () => {
@@ -41,7 +81,7 @@ export default function CalendarPage() {
     setCurrentDate(new Date());
   };
 
-  // Get week day for the first day
+  // Get week day for first day
   const firstDayOfWeek = monthStart.getDay();
 
   // Calculate days to pad at start
@@ -53,7 +93,7 @@ export default function CalendarPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Calendar</h1>
-          <p className="text-muted-foreground mt-1">View your transactions by date</p>
+          <p className="text-muted-foreground mt-1">View your transactions and recurring rules</p>
         </div>
       </div>
 
@@ -110,19 +150,19 @@ export default function CalendarPage() {
 
           {/* Actual days */}
           {daysInMonth.map((day) => {
-            const dayTransactions = getTransactionsForDate(day);
+            const dayEvents = getEventsForDate(day);
             const isToday = dayjs(day).isSame(new Date(), 'day');
             const isWeekend = day.getDay() === 0 || day.getDay() === 6;
 
-            const netAmount = dayTransactions.reduce((sum, t) => {
-              return sum + (t.type === 'income' ? t.amount : -t.amount);
-            }, 0);
+            const incomeEvents = dayEvents.filter(e => e.transactionType === 'income');
+            const expenseEvents = dayEvents.filter(e => e.transactionType === 'expense');
+            const netAmount = dayEvents.reduce((sum, e) => sum + (e.transactionType === 'income' ? e.amount : -e.amount), 0);
 
             return (
               <div
                 key={day.getDate()}
                 className={cn(
-                  'aspect-square rounded-lg border border-border p-2 transition-all hover:shadow-md',
+                  'aspect-square rounded-lg border border-border p-2 transition-all hover:shadow-md cursor-pointer',
                   isToday && 'bg-primary/10 border-primary',
                   isWeekend && 'bg-muted/20',
                   !isToday && 'bg-card hover:bg-muted/50'
@@ -136,33 +176,48 @@ export default function CalendarPage() {
                     {day.getDate()}
                   </span>
 
-                  {dayTransactions.length > 0 && (
-                    <div className="space-y-1">
-                      {dayTransactions.slice(0, 3).map((t) => {
-                        const isIncome = t.type === 'income';
+                  {dayEvents.length > 0 && (
+                    <div className="space-y-0.5">
+                      {dayEvents.slice(0, 3).map((event) => {
+                        const isIncome = event.transactionType === 'income';
+                        const isRule = event.type === 'rule';
+
                         return (
                           <div
-                            key={t.id}
+                            key={event.id}
                             className={cn(
-                              'text-xs truncate',
+                              'text-xs truncate flex items-center gap-1',
                               isIncome ? 'text-emerald-600' : 'text-destructive'
                             )}
-                            title={t.description || ''}
+                            title={`${event.name} - ${isIncome ? '+' : '-'}${event.amount.toFixed(2)}`}
                           >
-                            {t.description ? (t.description || '').substring(0, 12) + (t.description.length > 12 ? '...' : '') : isIncome ? '+' : '-'}
-                            {Math.abs(t.amount)}
+                            {isRule && <Repeat size={10} className="opacity-60" />}
+                            <span>
+                              {event.name.substring(0, 10)}{event.name.length > 10 ? '...' : ''}
+                            </span>
                           </div>
                         );
                       })}
-                      {dayTransactions.length > 3 && (
-                        <span className="text-xs text-muted-foreground">+{dayTransactions.length - 3} more</span>
+                      {dayEvents.length > 3 && (
+                        <span className="text-xs text-muted-foreground">+{dayEvents.length - 3} more</span>
                       )}
                     </div>
                   )}
 
-                  {dayTransactions.length === 0 && (
-                    <div className="text-xs text-muted-foreground font-mono text-center pt-1">
-                      {netAmount.toFixed(2)}
+                  {dayEvents.length === 0 && (
+                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground font-mono pt-1 opacity-50">
+                      <DollarSign size={10} />
+                      <span>0.00</span>
+                    </div>
+                  )}
+
+                  {/* Net amount indicator for days with events */}
+                  {dayEvents.length > 0 && (
+                    <div className={cn(
+                      'text-xs font-mono text-center border-t border-border/50 pt-0.5',
+                      netAmount >= 0 ? 'text-emerald-600' : 'text-destructive'
+                    )}>
+                      {netAmount >= 0 ? '+' : ''}{netAmount.toFixed(2)}
                     </div>
                   )}
                 </div>
@@ -173,7 +228,7 @@ export default function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-emerald-600" />
           <span>Income</span>
@@ -181,6 +236,10 @@ export default function CalendarPage() {
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-destructive" />
           <span>Expense</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Repeat size={14} className="opacity-60" />
+          <span>Recurring Rule</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-primary border-2 border-primary" />
