@@ -221,3 +221,13 @@ export const budgetActions = useBudgetStore.getState;
 
 // Export temporal actions for undo/redo
 export const temporalActions = useBudgetStore.temporal.getState;
+
+// Hook for temporal state (undo/redo)
+export const useTemporalState = () => {
+  const pastStates = useBudgetStore((state) => (state as any).pastStates as any[]);
+  const futureStates = useBudgetStore((state) => (state as any).futureStates as any[]);
+  const undo = useBudgetStore((state) => (state as any).undo);
+  const redo = useBudgetStore((state) => (state as any).redo);
+
+  return { pastStates, futureStates, undo, redo };
+};

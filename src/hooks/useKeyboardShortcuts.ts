@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
-import { useBudgetStore } from '@/store/useBudgetStore';
+import { useEffect } from 'react';
+import { useBudgetStore, temporalActions } from '@/store/useBudgetStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 
@@ -18,21 +18,19 @@ export function useKeyboardShortcuts() {
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    const temporalState = useBudgetStore.temporal.getState();
-
     // Define all keyboard shortcuts
     const shortcuts: ShortcutHandler[] = [
       {
         keys: ['Ctrl+Z', 'Cmd+Z'],
         description: 'Undo last action',
         category: 'Actions',
-        handler: () => temporalState.undo(),
+        handler: () => temporalActions().undo(),
       },
       {
         keys: ['Ctrl+Shift+Z', 'Cmd+Shift+Z'],
         description: 'Redo last action',
         category: 'Actions',
-        handler: () => temporalState.redo(),
+        handler: () => temporalActions().redo(),
       },
       {
         keys: ['Ctrl+T', 'Cmd+T'],
