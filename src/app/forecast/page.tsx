@@ -9,6 +9,8 @@ import { RealityAnchor } from '@/components/dashboard/RealityAnchor';
 import { QuickAddWidget } from '@/components/dashboard/QuickAddWidget';
 import { HistoryControls } from '@/components/ui/HistoryControls';
 import { BalanceChart } from '@/components/dashboard/BalanceChart';
+import { UpcomingTransactions } from '@/components/dashboard/UpcomingTransactions';
+import { ForecastStats } from '@/components/dashboard/ForecastStats';
 import { DayEditModal } from '@/components/dashboard/DayEditModal';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import dayjs from 'dayjs';
@@ -126,23 +128,8 @@ export default function ForecastPage() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-card border border-border rounded-lg p-4">
-          <p className="text-sm text-muted-foreground mb-1">Total Income</p>
-          <p className="text-2xl font-bold text-emerald-600">{formatCurrency(stats.totalIncome)}</p>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4">
-          <p className="text-sm text-muted-foreground mb-1">Total Expenses</p>
-          <p className="text-2xl font-bold text-destructive">{formatCurrency(stats.totalExpenses)}</p>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4">
-          <p className="text-sm text-muted-foreground mb-1">Final Balance</p>
-          <p className={`text-2xl font-bold ${stats.finalBalance >= 0 ? 'text-foreground' : 'text-destructive'}`}>
-            {formatCurrency(stats.finalBalance)}
-          </p>
-        </div>
-      </div>
+      {/* Enhanced Stats */}
+      <ForecastStats simulation={simulation} />
 
        {/* Chart - Recharts */}
        <div className="bg-card border border-border rounded-xl p-8 mb-8">
@@ -150,13 +137,8 @@ export default function ForecastPage() {
          <BalanceChart data={simulation} onDotClick={handleDotClick} />
        </div>
 
-      {/* Transactions Placeholder */}
-      <div className="bg-card border border-border rounded-xl p-8">
-        <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-        <div className="text-center text-muted-foreground py-8">
-          <p className="text-sm">Transaction list will be added here</p>
-        </div>
-      </div>
+       {/* Upcoming Transactions */}
+       <UpcomingTransactions simulation={simulation} days={14} onDateClick={handleDotClick} />
 
        {/* History Controls */}
        <HistoryControls />
