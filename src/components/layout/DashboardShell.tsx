@@ -4,6 +4,7 @@ import { Wallet, LineChart, Calendar, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -50,14 +51,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-sidebar-border">
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors"
-          >
-            <Settings size={18} />
-            Settings
-          </Link>
+        <div className="p-4 border-t border-sidebar-border space-y-3">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors"
+            >
+              <Settings size={18} />
+              Settings
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
 
