@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { KeyboardShortcutsHelp } from '@/components/ui/KeyboardShortcutsHelp';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -32,7 +33,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const isActive = pathname?.startsWith(item.href);
             const Icon = item.icon;
-            
+
             return (
               <Link
                 key={item.id}
@@ -72,6 +73,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp />
     </div>
   );
 }
