@@ -44,6 +44,9 @@ export interface OneTimeTransaction {
   is_reconciled: boolean;
   created_at: Date;
   updated_at: Date;
+  // Override fields for calendar adjustments to recurring rules
+  override_rule_id?: string | null;  // Links to the rule being overridden
+  is_override?: boolean;             // Flag to identify override transactions
 }
 
 export type OneTimeTransactionInput = Omit<
@@ -67,8 +70,9 @@ export interface SimulationTransaction {
   name: string;
   amount: number;
   type: TransactionType;
-  source: 'rule' | 'one-time';
+  source: 'rule' | 'one-time' | 'override';
   ruleId?: string;
+  isOverride?: boolean;  // Flag to identify override transactions in simulation
 }
 
 export interface DailySimulationResult {
@@ -79,6 +83,7 @@ export interface DailySimulationResult {
   endingBalance: number;
   isCheckpoint: boolean;
   isLowestPoint: boolean;
+  hasOverride?: boolean;  // Flag to indicate this day has manual adjustments
 }
 
 // ============== User Profile ==============

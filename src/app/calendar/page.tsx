@@ -2,11 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, DollarSign } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, DollarSign, Pencil, Edit3, AlertCircle } from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { matchesRecurrence } from '@/lib/dateUtils';
 import { cn } from '@/lib/utils';
-import { BudgetRule } from '@/types';
+import { BudgetRule, OneTimeTransaction } from '@/types';
+import { DayEditModal } from '@/components/dashboard/DayEditModal';
 
 interface CalendarEvent {
   type: 'transaction' | 'rule';
@@ -14,11 +15,15 @@ interface CalendarEvent {
   amount: number;
   transactionType: 'income' | 'expense';
   id: string;
+  ruleId?: string;
+  isOverride?: boolean;
+  originalAmount?: number;
 }
 
 export default function CalendarPage() {
   const { transactions, rules } = useBudgetStore();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const monthStart = dayjs(currentDate).startOf('month').toDate();
   const monthEnd = dayjs(currentDate).endOf('month').toDate();
@@ -36,11 +41,23 @@ export default function CalendarPage() {
   // Get all events for a specific date (one-time transactions + recurring rules)
   const getEventsForDate = (date: Date): CalendarEvent[] => {
     const events: CalendarEvent[] = [];
+    const dayStr = dayjs(date).format('YYYY-MM-DD');
 
-    // Add one-time transactions
+    // Get all override transactions for this date
+    const overrideTransactions = transactions.filter(t =>
+      t.is_override &&
+      dayjs(t.date).format('YYYY-MM-DD') === dayStr
+    );
+
+    // Track rule IDs that have overrides
+    const overriddenRuleIds = new Set(overrideTransactions.map(t => t.override_rule_id).filter(Boolean) as string[]);
+
+    // Add one-time transactions (non-override)
     const dayTransactions = transactions.filter(t => {
       const tDate = new Date(t.date);
-      return dayjs(date).isSame(tDate, 'month') && date.getDate() === tDate.getDate();
+      return !t.is_override &&
+             dayjs(date).isSame(tDate, 'month') &&
+             date.getDate() === tDate.getDate();
     });
 
     dayTransactions.forEach(t => {
@@ -53,8 +70,12 @@ export default function CalendarPage() {
       });
     });
 
-    // Add matching recurring rules (only active)
-    const matchingRules = rules.filter(rule => rule.is_active && matchesRecurrence(date, rule));
+    // Add matching recurring rules (only active and not overridden)
+    const matchingRules = rules.filter(rule =>
+      rule.is_active &&
+      !overriddenRuleIds.has(rule.id) &&
+      matchesRecurrence(date, rule)
+    );
 
     matchingRules.forEach(rule => {
       events.push({
@@ -66,7 +87,33 @@ export default function CalendarPage() {
       });
     });
 
+    // Add override transactions (replacing the rules they override)
+    overrideTransactions.forEach(t => {
+      if (t.override_rule_id) {
+        const rule = rules.find(r => r.id === t.override_rule_id);
+        events.push({
+          type: 'rule',
+          name: t.description || (rule?.name || 'Override'),
+          amount: t.amount,
+          transactionType: t.type,
+          id: t.id,
+          ruleId: t.override_rule_id,
+          isOverride: true,
+          originalAmount: rule?.amount,
+        });
+      }
+    });
+
     return events;
+  };
+
+  // Check if a date has overrides
+  const hasOverride = (date: Date): boolean => {
+    const dayStr = dayjs(date).format('YYYY-MM-DD');
+    return transactions.some(t =>
+      t.is_override &&
+      dayjs(t.date).format('YYYY-MM-DD') === dayStr
+    );
   };
 
   const goToPreviousMonth = () => {
@@ -153,6 +200,7 @@ export default function CalendarPage() {
             const dayEvents = getEventsForDate(day);
             const isToday = dayjs(day).isSame(new Date(), 'day');
             const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+            const dayHasOverride = hasOverride(day);
 
             const incomeEvents = dayEvents.filter(e => e.transactionType === 'income');
             const expenseEvents = dayEvents.filter(e => e.transactionType === 'expense');
@@ -162,36 +210,65 @@ export default function CalendarPage() {
               <div
                 key={day.getDate()}
                 className={cn(
-                  'aspect-square rounded-lg border border-border p-2 transition-all hover:shadow-md cursor-pointer',
+                  'aspect-square rounded-lg border border-border p-2 transition-all hover:shadow-md cursor-pointer relative group',
                   isToday && 'bg-primary/10 border-primary',
                   isWeekend && 'bg-muted/20',
                   !isToday && 'bg-card hover:bg-muted/50'
                 )}
+                onClick={() => setSelectedDate(day)}
               >
-                <div className="flex flex-col h-full justify-between">
-                  <span className={cn(
-                    'text-sm font-medium',
-                    isToday ? 'text-primary' : 'text-foreground'
-                  )}>
-                    {day.getDate()}
-                  </span>
+                {/* Edit button (hover) */}
+                <button
+                  className="absolute top-1 right-1 z-10 p-1 bg-primary/80 hover:bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDate(day);
+                  }}
+                  title="Edit day"
+                >
+                  <Pencil size={10} className="text-primary-foreground" />
+                </button>
+
+                <div className="flex flex-col h-full justify-between pt-2">
+                  <div className="space-y-1">
+                    <span className={cn(
+                      'text-sm font-medium',
+                      isToday ? 'text-primary' : 'text-foreground'
+                    )}>
+                      {day.getDate()}
+                    </span>
+
+                    {/* Override indicator underneath calendar number */}
+                    {dayHasOverride && (
+                      <div
+                        className="flex items-center gap-1 text-amber-600"
+                        title="This day has manual adjustments"
+                      >
+                        <Edit3 size={10} />
+                        <span className="text-xs font-semibold">Override</span>
+                      </div>
+                    )}
+                  </div>
 
                   {dayEvents.length > 0 && (
                     <div className="space-y-0.5">
                       {dayEvents.slice(0, 3).map((event) => {
                         const isIncome = event.transactionType === 'income';
                         const isRule = event.type === 'rule';
+                        const isOverride = event.isOverride;
 
                         return (
                           <div
                             key={event.id}
                             className={cn(
                               'text-xs truncate flex items-center gap-1',
-                              isIncome ? 'text-emerald-600' : 'text-destructive'
+                              isIncome ? 'text-emerald-600' : 'text-destructive',
+                              isOverride && 'font-semibold'
                             )}
                             title={`${event.name} - ${isIncome ? '+' : '-'}${event.amount.toFixed(2)}`}
                           >
-                            {isRule && <Repeat size={10} className="opacity-60" />}
+                            {isOverride && <AlertCircle size={10} className="text-amber-600" />}
+                            {isRule && !isOverride && <Repeat size={10} className="opacity-60" />}
                             <span>
                               {event.name.substring(0, 10)}{event.name.length > 10 ? '...' : ''}
                             </span>
@@ -242,10 +319,23 @@ export default function CalendarPage() {
           <span>Recurring Rule</span>
         </div>
         <div className="flex items-center gap-2">
+          <Edit3 size={14} className="text-amber-600" />
+          <span>Override</span>
+        </div>
+        <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-primary border-2 border-primary" />
           <span>Today</span>
         </div>
       </div>
+
+      {/* Day Edit Modal */}
+      {selectedDate && (
+        <DayEditModal
+          date={selectedDate}
+          events={getEventsForDate(selectedDate)}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
     </div>
   );
 }

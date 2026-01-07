@@ -57,19 +57,46 @@ export function runSimulation(
       continue;
     }
 
-    // 2. Find matching recurring rules (only active rules)
-    const dailyRules = rules.filter(rule =>
-      rule.is_active && matchesRecurrence(currentDate, rule)
-    );
-
-    // 3. Find matching one-off transactions
+    // 2. Find matching one-off transactions (including overrides)
     const dailyOneOffs = oneOffs.filter(t => {
       const transactionDate = toISODate(new Date(t.date));
       return transactionDate === dateStr;
     });
 
-    // 4. Combine all transactions
+    // 2a. Separate override transactions from regular one-offs
+    const overrideTransactions = dailyOneOffs.filter(t => t.is_override);
+    const regularOneOffs = dailyOneOffs.filter(t => !t.is_override);
+
+    // 2b. Build set of rule IDs that are overridden for this day
+    const overriddenRuleIds = new Set(
+      overrideTransactions
+        .map(t => t.override_rule_id)
+        .filter((id): id is string => id !== null && id !== undefined)
+    );
+
+    // 3. Find matching recurring rules (only active and not overridden)
+    const dailyRules = rules.filter(rule =>
+      rule.is_active &&
+      !overriddenRuleIds.has(rule.id) &&
+      matchesRecurrence(currentDate, rule)
+    );
+
+    // 4. Combine all transactions with priority: Override > One-time > Rule
     const transactions: SimulationTransaction[] = [
+      ...overrideTransactions.map(t => ({
+        name: t.description || 'Override',
+        amount: t.amount,
+        type: t.type,
+        source: 'override' as const,
+        ruleId: t.override_rule_id || undefined,
+        isOverride: true,
+      })),
+      ...regularOneOffs.map(t => ({
+        name: t.description || 'One-time Transaction',
+        amount: t.amount,
+        type: t.type,
+        source: 'one-time' as const,
+      })),
       ...dailyRules.map(r => ({
         name: r.name,
         amount: r.amount,
@@ -77,18 +104,15 @@ export function runSimulation(
         source: 'rule' as const,
         ruleId: r.id,
       })),
-      ...dailyOneOffs.map(t => ({
-        name: t.description || 'One-time Transaction',
-        amount: t.amount,
-        type: t.type,
-        source: 'one-time' as const,
-      })),
     ];
 
     // 5. Calculate net change
     const netChange = transactions.reduce((sum, t) => {
       return sum + (t.type === 'income' ? t.amount : -t.amount);
     }, 0);
+
+    // Check if this day has any override transactions
+    const hasOverride = transactions.some(t => t.source === 'override');
 
     // 6. Update running balance
     runningBalance += netChange;
@@ -110,6 +134,7 @@ export function runSimulation(
       endingBalance: runningBalance,
       isCheckpoint: false,
       isLowestPoint: minimumBalanceDates.includes(dateStr),
+      hasOverride,
     });
   }
 
