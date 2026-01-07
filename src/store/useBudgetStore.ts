@@ -64,10 +64,10 @@ export const useBudgetStore = create<BudgetState>()(
         saveStatus: 'idle',
 
         // Balance Actions
-        setBalance: (amount) => set({ currentBalance: amount, saveStatus: 'saving' }),
+        setBalance: (amount) => set({ currentBalance: amount }),
 
         // Rule Actions
-        setRules: (rules) => set({ rules, saveStatus: 'saving' }),
+        setRules: (rules) => set({ rules }),
         addRule: (rule) => set((state) => ({
           rules: [
             {
@@ -92,7 +92,7 @@ export const useBudgetStore = create<BudgetState>()(
         })),
 
         // Transaction Actions
-        setTransactions: (transactions) => set({ transactions, saveStatus: 'saving' }),
+        setTransactions: (transactions) => set({ transactions }),
         addTransaction: (transaction) => set((state) => ({
           transactions: [
             {
@@ -117,7 +117,7 @@ export const useBudgetStore = create<BudgetState>()(
         })),
 
         // Checkpoint Actions
-        setCheckpoints: (checkpoints) => set({ checkpoints, saveStatus: 'saving' }),
+        setCheckpoints: (checkpoints) => set({ checkpoints }),
         setCheckpoint: (date, balance) => set((state) => ({
           checkpoints: { ...state.checkpoints, [date]: balance },
           saveStatus: 'saving',
@@ -125,7 +125,7 @@ export const useBudgetStore = create<BudgetState>()(
         removeCheckpoint: (date) => set((state) => {
           const newCheckpoints = { ...state.checkpoints };
           delete newCheckpoints[date];
-          return { checkpoints: newCheckpoints, saveStatus: 'saving' };
+          return { checkpoints: newCheckpoints };
         }),
 
         // Save Status Actions
