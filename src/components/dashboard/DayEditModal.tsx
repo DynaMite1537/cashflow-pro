@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Pencil, Trash2, Plus, X, RotateCcw } from 'lucide-react';
+import { Pencil, Trash2, Plus, X, RotateCcw, ArrowLeft } from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { BudgetRule, OneTimeTransaction, TransactionType } from '@/types';
 import { toastSuccess, toastError } from '@/lib/toast';
@@ -20,9 +20,10 @@ interface DayEditModalProps {
     originalAmount?: number;
   }>;
   onClose: () => void;
+  onBack?: () => void;
 }
 
-export function DayEditModal({ date, events, onClose }: DayEditModalProps) {
+export function DayEditModal({ date, events, onClose, onBack }: DayEditModalProps) {
   const { rules, transactions, addTransaction, updateTransaction, deleteTransaction } = useBudgetStore();
 
   // State to track edits
@@ -174,24 +175,31 @@ export function DayEditModal({ date, events, onClose }: DayEditModalProps) {
     >
       <div className="bg-card text-card-foreground rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
         <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-bold flex items-center gap-2">
-                <Pencil size={20} />
-                Edit Day: {dayjs(date).format('MMM D, YYYY')}
-              </h3>
-              <p className="text-muted-foreground text-sm mt-1">
-                Adjust amounts for transactions and rules
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-muted rounded-lg transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
+           {/* Header */}
+           <div className="flex items-center justify-between mb-6">
+             <div>
+               <button
+                 onClick={onBack}
+                 className="p-2 hover:bg-muted rounded-lg transition-colors"
+                 title="Go back"
+               >
+                 <ArrowLeft size={20} />
+               </button>
+               <h3 className="text-xl font-bold flex items-center gap-2">
+                 <Pencil size={20} />
+                 Edit Day: {dayjs(date).format('MMM D, YYYY')}
+               </h3>
+               <p className="text-muted-foreground text-sm mt-1">
+                 Adjust amounts for transactions and rules
+               </p>
+             </div>
+             <button
+               onClick={onClose}
+               className="p-2 hover:bg-muted rounded-lg transition-colors"
+             >
+               <X size={20} />
+             </button>
+           </div>
 
           {/* Events List */}
           <div className="space-y-3">

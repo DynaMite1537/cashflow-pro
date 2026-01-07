@@ -16,14 +16,14 @@ interface BudgetRuleCardProps {
 export const BudgetRuleCard = memo(function BudgetRuleCard({ rule, onEdit, onDelete, onToggleActive }: BudgetRuleCardProps) {
   const isIncome = rule.type === 'income';
   const categoryColors: Record<string, string> = {
-    housing: 'bg-blue-500/10 text-blue-700 border-blue-200',
-    transport: 'bg-purple-500/10 text-purple-700 border-purple-200',
-    utilities: 'bg-yellow-500/10 text-yellow-700 border-yellow-200',
-    food: 'bg-orange-500/10 text-orange-700 border-orange-200',
-    entertainment: 'bg-pink-500/10 text-pink-700 border-pink-200',
-    debt: 'bg-red-500/10 text-red-700 border-red-200',
-    subscription: 'bg-cyan-500/10 text-cyan-700 border-cyan-200',
-    other: 'bg-gray-500/10 text-gray-700 border-gray-200',
+    housing: 'bg-[hsl(var(--category-housing))]/10 text-[hsl(var(--category-housing))] border-[hsl(var(--category-housing))/20]',
+    transport: 'bg-[hsl(var(--category-transport))]/10 text-[hsl(var(--category-transport))] border-[hsl(var(--category-transport))/20]',
+    utilities: 'bg-[hsl(var(--category-utilities))]/10 text-[hsl(var(--category-utilities))] border-[hsl(var(--category-utilities))/20]',
+    food: 'bg-[hsl(var(--category-food))]/10 text-[hsl(var(--category-food))] border-[hsl(var(--category-food))/20]',
+    entertainment: 'bg-[hsl(var(--category-entertainment))]/10 text-[hsl(var(--category-entertainment))] border-[hsl(var(--category-entertainment))/20]',
+    debt: 'bg-[hsl(var(--category-debt))]/10 text-[hsl(var(--category-debt))] border-[hsl(var(--category-debt))/20]',
+    subscription: 'bg-[hsl(var(--category-subscription))]/10 text-[hsl(var(--category-subscription))] border-[hsl(var(--category-subscription))/20]',
+    other: 'bg-[hsl(var(--category-other))]/10 text-[hsl(var(--category-other))] border-[hsl(var(--category-other))/20]',
   };
 
   return (

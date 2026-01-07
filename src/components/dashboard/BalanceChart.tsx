@@ -22,9 +22,10 @@ import { AlertCircle } from 'lucide-react';
 interface BalanceChartProps {
   data: DailySimulationResult[];
   height?: number;
+  onDotClick?: (date: Date) => void;
 }
 
-export const BalanceChart = memo(function BalanceChart({ data, height = 400 }: BalanceChartProps) {
+export const BalanceChart = memo(function BalanceChart({ data, height = 400, onDotClick }: BalanceChartProps) {
   // Transform data for Recharts
   const chartData = data.map((day) => ({
     date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -46,14 +47,27 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400 }: B
           x={cx}
           y={cy}
           r={6}
-          fill="#f59e0b"
+          fill="hsl(var(--chart-override-dot))"
           stroke="#d97706"
           strokeWidth={2}
           style={{ cursor: 'pointer' }}
+          onClick={() => onDotClick && onDotClick(new Date(key || payload.date))}
         />
       );
     }
-    return <circle key={key || payload.date} cx={cx} cy={cy} r={4} fill="hsl(var(--background))" stroke="hsl(var(--primary))" strokeWidth={2} />;
+    return (
+      <circle
+        key={key || payload.date}
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill="hsl(var(--background))"
+        stroke="hsl(var(--chart-line))"
+        strokeWidth={2}
+        style={{ cursor: 'pointer' }}
+        onClick={() => onDotClick && onDotClick(new Date(key || payload.date))}
+      />
+    );
   };
 
   // Custom active dot
@@ -66,13 +80,13 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400 }: B
           x={cx}
           y={cy}
           r={8}
-          fill="#f59e0b"
+          fill="hsl(var(--chart-override-dot))"
           stroke="#d97706"
           strokeWidth={2}
         />
       );
     }
-    return <circle key={key || payload.date} cx={cx} cy={cy} r={6} fill="hsl(var(--primary))" />;
+    return <circle key={key || payload.date} cx={cx} cy={cy} r={6} fill="hsl(var(--chart-line))" />;
   };
 
   // Custom tooltip to show override info
@@ -132,7 +146,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400 }: B
         <Line
           type="monotone"
           dataKey="balance"
-          stroke="hsl(var(--primary))"
+          stroke="hsl(var(--chart-line))"
           strokeWidth={2}
           dot={renderDot}
           activeDot={renderActiveDot}

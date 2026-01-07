@@ -2,11 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, DollarSign, Pencil, Edit3, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, Pencil, Edit3, AlertCircle } from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { matchesRecurrence } from '@/lib/dateUtils';
 import { cn } from '@/lib/utils';
-import { BudgetRule, OneTimeTransaction } from '@/types';
 import { DayEditModal } from '@/components/dashboard/DayEditModal';
 
 interface CalendarEvent {
@@ -18,6 +17,164 @@ interface CalendarEvent {
   ruleId?: string;
   isOverride?: boolean;
   originalAmount?: number;
+}
+
+// Custom Tooltip Component
+function EventTooltip({ event, children }: {
+  event: CalendarEvent;
+  children: React.ReactNode;
+}) {
+  const isIncome = event.transactionType === 'income';
+  const isRule = event.type === 'rule';
+  const isOverride = event.isOverride;
+
+  return (
+    <div className="relative group">
+      {children}
+
+      {/* Tooltip - appears on hover */}
+      <div className="
+        absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+        px-3 py-2 bg-popover text-popover-foreground
+        text-xs rounded-lg shadow-lg whitespace-nowrap
+        opacity-0 invisible group-hover:opacity-100 group-hover:visible
+        transition-all duration-200 ease-out
+        transform translate-y-1 group-hover:translate-y-0
+        z-20 min-w-[140px] text-left pointer-events-none
+      ">
+        {/* Event name */}
+        <div className="font-medium mb-1 truncate max-w-[200px]">
+          {event.name}
+        </div>
+
+        {/* Amount */}
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <span className={isIncome ? 'text-emerald-600' : 'text-destructive'}>
+            {isIncome ? '+' : '-'}${event.amount.toFixed(2)}
+          </span>
+          {isRule && <Repeat size={12} className="opacity-60" />}
+          {isOverride && <AlertCircle size={12} className="text-amber-600" />}
+        </div>
+
+        {/* Arrow */}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-popover" />
+      </div>
+    </div>
+  );
+}
+
+// Mobile Event Dots (2×3 grid, max 6 dots)
+function MobileEventDots({ events }: {
+  events: CalendarEvent[];
+}) {
+  // Show up to 6 dots in 2×3 grid
+  const displayDots = events.slice(0, 6);
+  const hasMore = events.length > 6;
+
+  return (
+    <div className="flex flex-col items-center gap-1.5 w-full py-1">
+      {/* Dots grid: 2 rows × 3 columns */}
+      <div className="grid grid-cols-3 gap-1.5 justify-center w-full">
+        {displayDots.map((event) => {
+          const isIncome = event.transactionType === 'income';
+          return (
+            <EventTooltip key={event.id} event={event}>
+              <div className={cn(
+                'w-1.5 h-1.5 rounded-full transition-transform duration-150 group-hover:scale-125',
+                isIncome ? 'bg-emerald-600' : 'bg-destructive'
+              )} />
+            </EventTooltip>
+          );
+        })}
+
+        {/* More indicator */}
+        {hasMore && (
+          <EventTooltip
+            event={{
+              name: `${events.length - 6} more events`,
+              amount: 0,
+              transactionType: 'expense',
+              type: 'transaction',
+              id: 'more',
+            }}
+          >
+            <div className="flex items-center justify-center w-1.5 h-1.5 text-[8px] text-muted-foreground">
+              ...
+            </div>
+          </EventTooltip>
+        )}
+      </div>
+
+      {/* Count badge */}
+      <div className="text-[10px] text-muted-foreground font-medium">
+        ...+{events.length}
+      </div>
+    </div>
+  );
+}
+
+// Tablet Event List (2 events)
+function TabletEventList({ events }: {
+  events: CalendarEvent[];
+}) {
+  const displayEvents = events.slice(0, 2);
+  const remaining = Math.max(0, events.length - 2);
+
+  return (
+    <div className="space-y-0.5">
+      {displayEvents.map((event) => (
+        <div key={event.id} className={cn(
+          'text-xs truncate flex items-center gap-1',
+          event.transactionType === 'income' ? 'text-emerald-600' : 'text-destructive',
+          event.isOverride && 'font-semibold'
+        )}>
+          {event.isOverride && <AlertCircle size={8} className="text-amber-600" />}
+          {event.type === 'rule' && !event.isOverride && <Repeat size={8} className="opacity-60" />}
+          <span className="truncate max-w-[120px]">
+            {event.name.substring(0, 10)}{event.name.length > 10 ? '...' : ''}
+          </span>
+        </div>
+      ))}
+
+      {remaining > 0 && (
+        <div className="text-xs text-muted-foreground truncate">
+          ...+{remaining}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Desktop Event List (3 events)
+function DesktopEventList({ events }: {
+  events: CalendarEvent[];
+}) {
+  const displayEvents = events.slice(0, 3);
+  const remaining = Math.max(0, events.length - 3);
+
+  return (
+    <div className="space-y-0.5">
+      {displayEvents.map((event) => (
+        <div key={event.id} className={cn(
+          'text-xs truncate flex items-center gap-1',
+          event.transactionType === 'income' ? 'text-emerald-600' : 'text-destructive',
+          event.isOverride && 'font-semibold'
+        )}>
+          {event.isOverride && <AlertCircle size={10} className="text-amber-600" />}
+          {event.type === 'rule' && !event.isOverride && <Repeat size={10} className="opacity-60" />}
+          <span className="truncate max-w-[160px]">
+            {event.name.substring(0, 12)}{event.name.length > 12 ? '...' : ''}
+          </span>
+        </div>
+      ))}
+
+      {remaining > 0 && (
+        <div className="text-xs text-muted-foreground truncate">
+          ...+{remaining}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function CalendarPage() {
@@ -87,7 +244,7 @@ export default function CalendarPage() {
       });
     });
 
-    // Add override transactions (replacing the rules they override)
+    // Add override transactions (replacing rules they override)
     overrideTransactions.forEach(t => {
       if (t.override_rule_id) {
         const rule = rules.find(r => r.id === t.override_rule_id);
@@ -210,7 +367,7 @@ export default function CalendarPage() {
               <div
                 key={day.getDate()}
                 className={cn(
-                  'aspect-square rounded-lg border border-border p-2 transition-all hover:shadow-md cursor-pointer relative group',
+                  'min-h-[50px] rounded-lg border border-border p-2 relative flex flex-col',
                   isToday && 'bg-primary/10 border-primary',
                   isWeekend && 'bg-muted/20',
                   !isToday && 'bg-card hover:bg-muted/50'
@@ -219,7 +376,7 @@ export default function CalendarPage() {
               >
                 {/* Edit button (hover) */}
                 <button
-                  className="absolute top-1 right-1 z-10 p-1 bg-primary/80 hover:bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 z-10 p-1 bg-primary/80 hover:bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedDate(day);
@@ -229,75 +386,60 @@ export default function CalendarPage() {
                   <Pencil size={10} className="text-primary-foreground" />
                 </button>
 
-                <div className="flex flex-col h-full justify-between pt-2">
-                  <div className="space-y-1">
-                    <span className={cn(
-                      'text-sm font-medium',
-                      isToday ? 'text-primary' : 'text-foreground'
-                    )}>
-                      {day.getDate()}
-                    </span>
+                {/* Day number with override icon */}
+                <div className="flex items-center justify-center pt-1">
+                  <span className={cn(
+                    'text-sm font-medium relative inline-block',
+                    isToday ? 'text-primary' : 'text-foreground'
+                  )}>
+                    {day.getDate()}
 
-                    {/* Override indicator underneath calendar number */}
+                    {/* Override: Icon only, no background */}
                     {dayHasOverride && (
-                      <div
-                        className="flex items-center gap-1 text-amber-600"
-                        title="This day has manual adjustments"
-                      >
-                        <Edit3 size={10} />
-                        <span className="text-xs font-semibold">Override</span>
-                      </div>
+                      <Edit3
+                        size={12}
+                        className="absolute -top-1.5 -right-2.5 text-amber-600"
+                      />
                     )}
+                  </span>
+                </div>
+
+                {/* Events display - flex-1 to fill available space */}
+                <div className="flex-1 flex flex-col justify-center min-h-0">
+                  {/* Empty state: nothing (for all breakpoints) */}
+                  {dayEvents.length === 0 && null}
+
+                {/* Mobile: Dot display */}
+                {dayEvents.length > 0 && (
+                  <div className="block md:hidden mt-1">
+                    <MobileEventDots events={dayEvents} />
                   </div>
+                )}
 
+                  {/* Tablet: 2 events */}
                   {dayEvents.length > 0 && (
-                    <div className="space-y-0.5">
-                      {dayEvents.slice(0, 3).map((event) => {
-                        const isIncome = event.transactionType === 'income';
-                        const isRule = event.type === 'rule';
-                        const isOverride = event.isOverride;
-
-                        return (
-                          <div
-                            key={event.id}
-                            className={cn(
-                              'text-xs truncate flex items-center gap-1',
-                              isIncome ? 'text-emerald-600' : 'text-destructive',
-                              isOverride && 'font-semibold'
-                            )}
-                            title={`${event.name} - ${isIncome ? '+' : '-'}${event.amount.toFixed(2)}`}
-                          >
-                            {isOverride && <AlertCircle size={10} className="text-amber-600" />}
-                            {isRule && !isOverride && <Repeat size={10} className="opacity-60" />}
-                            <span>
-                              {event.name.substring(0, 10)}{event.name.length > 10 ? '...' : ''}
-                            </span>
-                          </div>
-                        );
-                      })}
-                      {dayEvents.length > 3 && (
-                        <span className="text-xs text-muted-foreground">+{dayEvents.length - 3} more</span>
-                      )}
+                    <div className="hidden md:block lg:hidden">
+                      <TabletEventList events={dayEvents} />
                     </div>
                   )}
 
-                  {dayEvents.length === 0 && (
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground font-mono pt-1 opacity-50">
-                      <DollarSign size={10} />
-                      <span>0.00</span>
-                    </div>
-                  )}
-
-                  {/* Net amount indicator for days with events */}
+                  {/* Desktop: 3 events */}
                   {dayEvents.length > 0 && (
-                    <div className={cn(
-                      'text-xs font-mono text-center border-t border-border/50 pt-0.5',
-                      netAmount >= 0 ? 'text-emerald-600' : 'text-destructive'
-                    )}>
-                      {netAmount >= 0 ? '+' : ''}{netAmount.toFixed(2)}
+                    <div className="hidden lg:block">
+                      <DesktopEventList events={dayEvents} />
                     </div>
                   )}
                 </div>
+
+                {/* Net amount at bottom - tablet/desktop only */}
+                {dayEvents.length > 0 && (
+                  <div className={cn(
+                    'text-xs font-mono text-center border-t border-border/50 pt-0.5 hidden md:block pb-1',
+                    netAmount >= 0 ? 'text-emerald-600' : 'text-destructive'
+                  )}>
+                    {netAmount >= 0 ? '+' : '-'}${Math.abs(netAmount).toFixed(2)}
+                  </div>
+                )}
               </div>
             );
           })}
