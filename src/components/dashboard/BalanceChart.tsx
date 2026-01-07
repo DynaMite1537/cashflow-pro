@@ -53,11 +53,11 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           key={key || payload.date}
           x={cx}
           y={cy}
-          r={6}
-          fill="hsl(var(--chart-override-dot))"
+          r={7}
+          fill="#f59e0b"
           stroke="#d97706"
-          strokeWidth={2}
-          style={{ cursor: 'pointer' }}
+          strokeWidth={2.5}
+          style={{ cursor: 'pointer', filter: 'drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3))' }}
           onClick={() => onDotClick && onDotClick(new Date(key || payload.date))}
         />
       );
@@ -67,11 +67,11 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
         key={key || payload.date}
         cx={cx}
         cy={cy}
-        r={4}
-        fill="hsl(var(--background))"
-        stroke="hsl(var(--chart-line))"
+        r={5}
+        fill="hsl(var(--chart-line))"
+        stroke="hsl(var(--background))"
         strokeWidth={2}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', filter: 'drop-shadow(0 2px 4px rgba(33, 133, 208, 0.3))' }}
         onClick={() => onDotClick && onDotClick(new Date(key || payload.date))}
       />
     );
@@ -86,14 +86,26 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           key={key || payload.date}
           x={cx}
           y={cy}
-          r={8}
-          fill="hsl(var(--chart-override-dot))"
+          r={9}
+          fill="#f59e0b"
           stroke="#d97706"
-          strokeWidth={2}
+          strokeWidth={3}
+          style={{ filter: 'drop-shadow(0 3px 6px rgba(245, 158, 11, 0.4))' }}
         />
       );
     }
-    return <circle key={key || payload.date} cx={cx} cy={cy} r={6} fill="hsl(var(--chart-line))" />;
+    return (
+      <circle
+        key={key || payload.date}
+        cx={cx}
+        cy={cy}
+        r={7}
+        fill="hsl(var(--chart-line))"
+        stroke="hsl(var(--background))"
+        strokeWidth={3}
+        style={{ filter: 'drop-shadow(0 3px 6px rgba(33, 133, 208, 0.4))' }}
+      />
+    );
   };
 
   // Custom tooltip to show override info
@@ -220,7 +232,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           type="monotone"
           dataKey="balance"
           stroke="hsl(var(--chart-line))"
-          strokeWidth={2}
+          strokeWidth={3}
           dot={renderDot}
           activeDot={renderActiveDot}
           isAnimationActive={true}
@@ -231,7 +243,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           type="monotone"
           dataKey="startingBalance"
           stroke="hsl(var(--muted))"
-          strokeWidth={1}
+          strokeWidth={2}
           strokeDasharray="5 5"
           dot={false}
           name="Starting Balance"
@@ -243,6 +255,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
             y={0}
             stroke="hsl(var(--destructive))"
             strokeWidth={2}
+            strokeDasharray="4 4"
             label="Zero"
           />
         )}
