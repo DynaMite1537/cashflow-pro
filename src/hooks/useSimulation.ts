@@ -19,7 +19,11 @@ interface UseSimulationReturn {
  */
 export function useSimulation(options: UseSimulationOptions = {}): UseSimulationReturn {
   // Use shallow selector to prevent unnecessary re-renders
-  const { currentBalance, rules, transactions, checkpoints } = useBudgetStore();
+  const state = useBudgetStore();
+  const currentBalance = state.currentBalance;
+  const rules = state.rules;
+  const transactions = state.transactions;
+  const checkpoints = state.checkpoints;
   const { daysToProject = 90 } = options;
 
   // Memoize checkpoint conversion - only re-run when checkpoints change
