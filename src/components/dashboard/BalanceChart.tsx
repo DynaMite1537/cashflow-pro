@@ -57,7 +57,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           fill="#f59e0b"
           stroke="#d97706"
           strokeWidth={2.5}
-          style={{ cursor: 'pointer', filter: 'drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3))' }}
+          style={{ cursor: 'pointer' }}
           onClick={() => onDotClick && onDotClick(new Date(key || payload.date))}
         />
       );
@@ -71,7 +71,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
         fill="hsl(var(--chart-line))"
         stroke="hsl(var(--background))"
         strokeWidth={2}
-        style={{ cursor: 'pointer', filter: 'drop-shadow(0 2px 4px rgba(33, 133, 208, 0.3))' }}
+        style={{ cursor: 'pointer' }}
         onClick={() => onDotClick && onDotClick(new Date(key || payload.date))}
       />
     );
@@ -90,7 +90,6 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           fill="#f59e0b"
           stroke="#d97706"
           strokeWidth={3}
-          style={{ filter: 'drop-shadow(0 3px 6px rgba(245, 158, 11, 0.4))' }}
         />
       );
     }
@@ -103,7 +102,6 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
         fill="hsl(var(--chart-line))"
         stroke="hsl(var(--background))"
         strokeWidth={3}
-        style={{ filter: 'drop-shadow(0 3px 6px rgba(33, 133, 208, 0.4))' }}
       />
     );
   };
