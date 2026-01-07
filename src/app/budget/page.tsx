@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Filter, Search, SortAsc, SortDesc, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { toastSuccess, toastError, toastInfo } from '@/lib/toast';
 import { BudgetRuleCard } from '@/components/dashboard/BudgetRuleCard';
 import { NoRules } from '@/components/ui/EmptyState';
-import { BudgetRule } from '@/types';
+import { BudgetRuleForm } from '@/components/dashboard/BudgetRuleForm';
+import { BudgetRule, BudgetRuleInput } from '@/types';
 
 type FilterType = 'all' | 'income' | 'expense' | 'active' | 'inactive';
 type SortType = 'name-asc' | 'name-desc' | 'amount-asc' | 'amount-desc' | 'date-asc' | 'date-desc';
@@ -51,10 +52,30 @@ export default function BudgetPage() {
       }
     });
 
-  // Stats
-  const totalIncome = filteredRules.filter(r => r.type === 'income').reduce((sum, r) => sum + r.amount, 0);
-  const totalExpenses = filteredRules.filter(r => r.type === 'expense').reduce((sum, r) => sum + r.amount, 0);
-  const monthlyNet = totalIncome - totalExpenses;
+  // Helper function to convert amount to monthly equivalent
+  const toMonthlyAmount = (amount: number, frequency: string) => {
+    switch (frequency) {
+      case 'weekly':
+        return amount * 52 / 12; // 52 weeks per year / 12 months
+      case 'bi-weekly':
+        return amount * 26 / 12; // 26 bi-weekly periods per year / 12 months
+      case 'monthly':
+        return amount;
+      case 'yearly':
+        return amount / 12;
+      default:
+        return amount;
+    }
+  };
+
+  // Stats (always calculate from active rules only, regardless of current filter)
+  const activeIncome = rules
+    .filter(r => r.type === 'income' && r.is_active)
+    .reduce((sum, r) => sum + toMonthlyAmount(r.amount, r.frequency), 0);
+  const activeExpenses = rules
+    .filter(r => r.type === 'expense' && r.is_active)
+    .reduce((sum, r) => sum + toMonthlyAmount(r.amount, r.frequency), 0);
+  const monthlyNet = activeIncome - activeExpenses;
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this budget rule?')) {
@@ -68,6 +89,24 @@ export default function BudgetPage() {
     const status = !rule.is_active ? 'activated' : 'deactivated';
     toastSuccess(`Rule ${status}`, `"${rule.name}" is now ${status}`);
   };
+
+  const handleCloseModal = () => {
+    setShowForm(false);
+    setEditingRule(null);
+  };
+
+  // Close modal on Escape key
+  useEffect(() => {
+    if (showForm || editingRule !== null) {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          handleCloseModal();
+        }
+      };
+      window.addEventListener('keydown', handleEscape);
+      return () => window.removeEventListener('keydown', handleEscape);
+    }
+  }, [showForm, editingRule]);
 
   return (
     <div className="space-y-6">
@@ -96,7 +135,7 @@ export default function BudgetPage() {
             <p className="text-sm text-muted-foreground">Monthly Income</p>
           </div>
           <p className="text-2xl font-bold text-emerald-600">
-            ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ${activeIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
         <div className="bg-card border border-border rounded-lg p-4">
@@ -105,7 +144,7 @@ export default function BudgetPage() {
             <p className="text-sm text-muted-foreground">Monthly Expenses</p>
           </div>
           <p className="text-2xl font-bold text-destructive">
-            ${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ${activeExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
         <div className="bg-card border border-border rounded-lg p-4">
@@ -190,36 +229,48 @@ export default function BudgetPage() {
       )}
 
       {/* Form Modal */}
-      {showForm && editingRule === null && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {(showForm || editingRule !== null) && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            // Close on backdrop click
+            if (e.target === e.currentTarget) {
+              handleCloseModal();
+            }
+          }}
+        >
           <div className="bg-card text-card-foreground rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <h3 className="text-xl font-bold mb-6">Create New Budget Rule</h3>
+              <h3 className="text-xl font-bold mb-2">
+                {editingRule ? 'Edit Budget Rule' : 'Create New Budget Rule'}
+              </h3>
               <p className="text-muted-foreground text-sm mb-6">
-                Set up a recurring income or expense
+                {editingRule ? 'Update your recurring income or expense' : 'Set up a recurring income or expense'}
               </p>
-              
-              {/* Simplified form for now - full form coming soon */}
-              <div className="space-y-4">
-                <button
-                  onClick={() => {
-                    toastInfo('Coming soon', 'Full form will be implemented');
-                    setShowForm(false);
-                  }}
-                  className="w-full py-3 border border-border rounded-md text-muted-foreground hover:bg-accent transition-colors"
-                >
-                  Select income/expense type, amount, frequency
-                </button>
-              </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 py-2 rounded-md border border-border hover:bg-muted transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
+              <BudgetRuleForm
+                editingRule={editingRule}
+                onSubmit={(data) => {
+                  try {
+                    if (editingRule) {
+                      updateRule(editingRule.id, data);
+                      toastSuccess('Rule updated', `"${data.name}" has been updated`);
+                    } else {
+                      addRule(data);
+                      toastSuccess('Rule created', `"${data.name}" has been added`);
+                    }
+                    setShowForm(false);
+                    setEditingRule(null);
+                  } catch (error) {
+                    toastError('Error', 'Failed to save budget rule');
+                    console.error('Failed to save budget rule:', error);
+                  }
+                }}
+                onCancel={() => {
+                  setShowForm(false);
+                  setEditingRule(null);
+                }}
+              />
             </div>
           </div>
         </div>

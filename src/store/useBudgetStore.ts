@@ -4,6 +4,19 @@ import { temporal } from 'zundo';
 import { persist } from 'zustand/middleware';
 import { BudgetRule, OneTimeTransaction, SaveStatus } from '@/types';
 
+// Helper to revive dates from JSON
+const reviver = (key: string, value: any) => {
+  if (key === 'start_date' || key === 'end_date' || key === 'date' || key === 'created_at' || key === 'updated_at') {
+    if (typeof value === 'string' || typeof value === 'number') {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+  }
+  return value;
+};
+
 interface BudgetState {
   // State
   currentBalance: number;
@@ -138,6 +151,27 @@ export const useBudgetStore = create<BudgetState>()(
           transactions: state.transactions,
           checkpoints: state.checkpoints,
         }),
+        // Hydrate state with date conversion
+        onRehydrateStorage: () => (state) => {
+          if (!state) return;
+
+          // Convert date strings to Date objects in rules
+          state.rules = state.rules.map((rule: BudgetRule) => ({
+            ...rule,
+            start_date: rule.start_date instanceof Date ? rule.start_date : new Date(rule.start_date),
+            end_date: rule.end_date instanceof Date ? rule.end_date : (rule.end_date ? new Date(rule.end_date) : null),
+            created_at: rule.created_at instanceof Date ? rule.created_at : new Date(rule.created_at),
+            updated_at: rule.updated_at instanceof Date ? rule.updated_at : new Date(rule.updated_at),
+          }));
+
+          // Convert date strings to Date objects in transactions
+          state.transactions = state.transactions.map((tx: OneTimeTransaction) => ({
+            ...tx,
+            date: tx.date instanceof Date ? tx.date : new Date(tx.date),
+            created_at: tx.created_at instanceof Date ? tx.created_at : new Date(tx.created_at),
+            updated_at: tx.updated_at instanceof Date ? tx.updated_at : new Date(tx.updated_at),
+          }));
+        },
         // Handle migrations if needed
         migrate: (persistedState: any, version: number) => {
           if (version === 0) {

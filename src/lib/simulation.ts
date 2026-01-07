@@ -57,9 +57,9 @@ export function runSimulation(
       continue;
     }
 
-    // 2. Find matching recurring rules
-    const dailyRules = rules.filter(rule => 
-      matchesRecurrence(currentDate, rule)
+    // 2. Find matching recurring rules (only active rules)
+    const dailyRules = rules.filter(rule =>
+      rule.is_active && matchesRecurrence(currentDate, rule)
     );
 
     // 3. Find matching one-off transactions
