@@ -91,14 +91,13 @@ export function useKeyboardShortcuts() {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check if user is typing in an input field
       const target = event.target as HTMLElement;
-      const isInput = target.tagName === 'INPUT' ||
-                     target.tagName === 'TEXTAREA' ||
-                     target.isContentEditable;
+      const isInput =
+        target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 
       if (isInput) {
         // Only allow Escape in input fields
         if (event.key === 'Escape') {
-          const escapeShortcut = shortcuts.find(s => s.keys.includes('Escape'));
+          const escapeShortcut = shortcuts.find((s) => s.keys.includes('Escape'));
           escapeShortcut?.handler(event);
         }
         return;
@@ -115,7 +114,7 @@ export function useKeyboardShortcuts() {
       const keyCombo = parts.join('+');
 
       // Find matching shortcut
-      const shortcut = shortcuts.find(s => s.keys.includes(keyCombo));
+      const shortcut = shortcuts.find((s) => s.keys.includes(keyCombo));
 
       if (shortcut) {
         event.preventDefault();

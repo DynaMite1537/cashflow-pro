@@ -32,34 +32,34 @@ export function useValidation<T extends z.ZodType, U extends z.infer<T>>(
     }
   }, [schema, values]);
 
-  const updateField = useCallback(<K extends keyof U>(
-    field: K,
-    value: U[K]
-  ) => {
+  const updateField = useCallback(<K extends keyof U>(field: K, value: U[K]) => {
     setValues((prev) => ({ ...prev, [field]: value }));
     // Clear error for this field
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   }, []);
 
-  const validateField = useCallback(<K extends keyof U>(field: K): boolean => {
-    try {
-      // Try to get shape if it's a ZodObject, otherwise just validate the whole object
-      const zodSchema = schema as unknown as z.ZodObject<any>;
-      if ('shape' in zodSchema && zodSchema.shape[field as string]) {
-        zodSchema.shape[field as string].parse(values[field]);
+  const validateField = useCallback(
+    <K extends keyof U>(field: K): boolean => {
+      try {
+        // Try to get shape if it's a ZodObject, otherwise just validate the whole object
+        const zodSchema = schema as unknown as z.ZodObject<any>;
+        if ('shape' in zodSchema && zodSchema.shape[field as string]) {
+          zodSchema.shape[field as string].parse(values[field]);
+        }
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+        return true;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          setErrors((prev) => ({
+            ...prev,
+            [field]: error.errors[0]?.message || 'Invalid value',
+          }));
+        }
+        return false;
       }
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: error.errors[0]?.message || 'Invalid value',
-        }));
-      }
-      return false;
-    }
-  }, [schema, values]);
+    },
+    [schema, values]
+  );
 
   const reset = useCallback(() => {
     setValues(initialValues);

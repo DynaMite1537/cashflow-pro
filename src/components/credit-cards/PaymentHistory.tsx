@@ -50,7 +50,11 @@ export function PaymentHistory({ onEditPayment }: PaymentHistoryProps) {
 
   const handleDelete = (paymentId: string, amount: number, cardId: string) => {
     const card = creditCards.find((c) => c.id === cardId);
-    if (confirm(`Are you sure you want to delete this ${formatCurrency(amount)} payment to "${card?.name}"?`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete this ${formatCurrency(amount)} payment to "${card?.name}"?`
+      )
+    ) {
       deletePayment(paymentId);
     }
   };
@@ -69,7 +73,10 @@ export function PaymentHistory({ onEditPayment }: PaymentHistoryProps) {
         {/* Filters */}
         <div className="flex gap-3 flex-wrap">
           <div className="relative">
-            <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Filter
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
             <select
               value={filterCardId}
               onChange={(e) => setFilterCardId(e.target.value)}

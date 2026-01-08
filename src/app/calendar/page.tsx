@@ -2,7 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, Pencil, Edit3, AlertCircle } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon,
+  Repeat,
+  Pencil,
+  Edit3,
+  AlertCircle,
+} from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { matchesRecurrence } from '@/lib/dateUtils';
 import { getEventsForDate } from '@/lib/calendarUtils';
@@ -11,10 +19,7 @@ import { cn } from '@/lib/utils';
 import { DayEditModal } from '@/components/dashboard/DayEditModal';
 
 // Custom Tooltip Component
-function EventTooltip({ event, children }: {
-  event: CalendarEvent;
-  children: React.ReactNode;
-}) {
+function EventTooltip({ event, children }: { event: CalendarEvent; children: React.ReactNode }) {
   const isIncome = event.transactionType === 'income';
   const isRule = event.type === 'rule';
   const isOverride = event.isOverride;
@@ -24,7 +29,8 @@ function EventTooltip({ event, children }: {
       {children}
 
       {/* Tooltip - appears on hover */}
-      <div className="
+      <div
+        className="
         absolute bottom-full left-1/2 -translate-x-1/2 mb-2
         px-3 py-2 bg-popover text-popover-foreground
         text-xs rounded-lg shadow-lg whitespace-nowrap
@@ -32,11 +38,10 @@ function EventTooltip({ event, children }: {
         transition-all duration-200 ease-out
         transform translate-y-1 group-hover:translate-y-0
         z-20 min-w-[140px] text-left pointer-events-none
-      ">
+      "
+      >
         {/* Event name */}
-        <div className="font-medium mb-1 truncate max-w-[200px]">
-          {event.name}
-        </div>
+        <div className="font-medium mb-1 truncate max-w-[200px]">{event.name}</div>
 
         {/* Amount */}
         <div className="flex items-center gap-1 text-muted-foreground">
@@ -55,9 +60,7 @@ function EventTooltip({ event, children }: {
 }
 
 // Mobile Event Dots (2×3 grid, max 6 dots)
-function MobileEventDots({ events }: {
-  events: CalendarEvent[];
-}) {
+function MobileEventDots({ events }: { events: CalendarEvent[] }) {
   // Show up to 6 dots in 2×3 grid
   const displayDots = events.slice(0, 6);
   const hasMore = events.length > 6;
@@ -70,10 +73,12 @@ function MobileEventDots({ events }: {
           const isIncome = event.transactionType === 'income';
           return (
             <EventTooltip key={event.id} event={event}>
-              <div className={cn(
-                'w-1.5 h-1.5 rounded-full transition-transform duration-150 group-hover:scale-125',
-                isIncome ? 'bg-emerald-600' : 'bg-destructive'
-              )} />
+              <div
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full transition-transform duration-150 group-hover:scale-125',
+                  isIncome ? 'bg-emerald-600' : 'bg-destructive'
+                )}
+              />
             </EventTooltip>
           );
         })}
@@ -97,72 +102,72 @@ function MobileEventDots({ events }: {
       </div>
 
       {/* Count badge */}
-      <div className="text-[10px] text-muted-foreground font-medium">
-        ...+{events.length}
-      </div>
+      <div className="text-[10px] text-muted-foreground font-medium">...+{events.length}</div>
     </div>
   );
 }
 
 // Tablet Event List (2 events)
-function TabletEventList({ events }: {
-  events: CalendarEvent[];
-}) {
+function TabletEventList({ events }: { events: CalendarEvent[] }) {
   const displayEvents = events.slice(0, 2);
   const remaining = Math.max(0, events.length - 2);
 
   return (
     <div className="space-y-0.5">
       {displayEvents.map((event) => (
-        <div key={event.id} className={cn(
-          'text-xs truncate flex items-center gap-1',
-          event.transactionType === 'income' ? 'text-emerald-600' : 'text-destructive',
-          event.isOverride && 'font-semibold'
-        )}>
+        <div
+          key={event.id}
+          className={cn(
+            'text-xs truncate flex items-center gap-1',
+            event.transactionType === 'income' ? 'text-emerald-600' : 'text-destructive',
+            event.isOverride && 'font-semibold'
+          )}
+        >
           {event.isOverride && <AlertCircle size={8} className="text-amber-600" />}
           {event.type === 'rule' && !event.isOverride && <Repeat size={8} className="opacity-60" />}
           <span className="truncate max-w-[120px]">
-            {event.name.substring(0, 10)}{event.name.length > 10 ? '...' : ''}
+            {event.name.substring(0, 10)}
+            {event.name.length > 10 ? '...' : ''}
           </span>
         </div>
       ))}
 
       {remaining > 0 && (
-        <div className="text-xs text-muted-foreground truncate">
-          ...+{remaining}
-        </div>
+        <div className="text-xs text-muted-foreground truncate">...+{remaining}</div>
       )}
     </div>
   );
 }
 
 // Desktop Event List (3 events)
-function DesktopEventList({ events }: {
-  events: CalendarEvent[];
-}) {
+function DesktopEventList({ events }: { events: CalendarEvent[] }) {
   const displayEvents = events.slice(0, 3);
   const remaining = Math.max(0, events.length - 3);
 
   return (
     <div className="space-y-0.5">
       {displayEvents.map((event) => (
-        <div key={event.id} className={cn(
-          'text-xs truncate flex items-center gap-1',
-          event.transactionType === 'income' ? 'text-emerald-600' : 'text-destructive',
-          event.isOverride && 'font-semibold'
-        )}>
+        <div
+          key={event.id}
+          className={cn(
+            'text-xs truncate flex items-center gap-1',
+            event.transactionType === 'income' ? 'text-emerald-600' : 'text-destructive',
+            event.isOverride && 'font-semibold'
+          )}
+        >
           {event.isOverride && <AlertCircle size={10} className="text-amber-600" />}
-          {event.type === 'rule' && !event.isOverride && <Repeat size={10} className="opacity-60" />}
+          {event.type === 'rule' && !event.isOverride && (
+            <Repeat size={10} className="opacity-60" />
+          )}
           <span className="truncate max-w-[160px]">
-            {event.name.substring(0, 12)}{event.name.length > 12 ? '...' : ''}
+            {event.name.substring(0, 12)}
+            {event.name.length > 12 ? '...' : ''}
           </span>
         </div>
       ))}
 
       {remaining > 0 && (
-        <div className="text-xs text-muted-foreground truncate">
-          ...+{remaining}
-        </div>
+        <div className="text-xs text-muted-foreground truncate">...+{remaining}</div>
       )}
     </div>
   );
@@ -189,10 +194,7 @@ export default function CalendarPage() {
   // Check if a date has overrides
   const hasOverride = (date: Date): boolean => {
     const dayStr = dayjs(date).format('YYYY-MM-DD');
-    return transactions.some(t =>
-      t.is_override &&
-      dayjs(t.date).format('YYYY-MM-DD') === dayStr
-    );
+    return transactions.some((t) => t.is_override && dayjs(t.date).format('YYYY-MM-DD') === dayStr);
   };
 
   const goToPreviousMonth = () => {
@@ -231,9 +233,7 @@ export default function CalendarPage() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-accent transition-colors"
           >
             <ChevronLeft size={20} />
-            <span className="font-medium">
-              {dayjs(currentDate).format('MMMM YYYY')}
-            </span>
+            <span className="font-medium">{dayjs(currentDate).format('MMMM YYYY')}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -268,10 +268,7 @@ export default function CalendarPage() {
         <div className="grid grid-cols-7 gap-2">
           {/* Padding days from previous month */}
           {paddingDays.map((_, i) => (
-            <div
-              key={`pad-${i}`}
-              className="aspect-square rounded-lg"
-            />
+            <div key={`pad-${i}`} className="aspect-square rounded-lg" />
           ))}
 
           {/* Actual days */}
@@ -281,9 +278,12 @@ export default function CalendarPage() {
             const isWeekend = day.getDay() === 0 || day.getDay() === 6;
             const dayHasOverride = hasOverride(day);
 
-            const incomeEvents = dayEvents.filter(e => e.transactionType === 'income');
-            const expenseEvents = dayEvents.filter(e => e.transactionType === 'expense');
-            const netAmount = dayEvents.reduce((sum, e) => sum + (e.transactionType === 'income' ? e.amount : -e.amount), 0);
+            const incomeEvents = dayEvents.filter((e) => e.transactionType === 'income');
+            const expenseEvents = dayEvents.filter((e) => e.transactionType === 'expense');
+            const netAmount = dayEvents.reduce(
+              (sum, e) => sum + (e.transactionType === 'income' ? e.amount : -e.amount),
+              0
+            );
 
             return (
               <div
@@ -310,18 +310,17 @@ export default function CalendarPage() {
 
                 {/* Day number with override icon */}
                 <div className="flex items-center justify-center pt-1">
-                  <span className={cn(
-                    'text-sm font-medium relative inline-block',
-                    isToday ? 'text-primary' : 'text-foreground'
-                  )}>
+                  <span
+                    className={cn(
+                      'text-sm font-medium relative inline-block',
+                      isToday ? 'text-primary' : 'text-foreground'
+                    )}
+                  >
                     {day.getDate()}
 
                     {/* Override: Icon only, no background */}
                     {dayHasOverride && (
-                      <Edit3
-                        size={12}
-                        className="absolute -top-1.5 -right-2.5 text-amber-600"
-                      />
+                      <Edit3 size={12} className="absolute -top-1.5 -right-2.5 text-amber-600" />
                     )}
                   </span>
                 </div>
@@ -331,12 +330,12 @@ export default function CalendarPage() {
                   {/* Empty state: nothing (for all breakpoints) */}
                   {dayEvents.length === 0 && null}
 
-                {/* Mobile: Dot display */}
-                {dayEvents.length > 0 && (
-                  <div className="block md:hidden mt-1">
-                    <MobileEventDots events={dayEvents} />
-                  </div>
-                )}
+                  {/* Mobile: Dot display */}
+                  {dayEvents.length > 0 && (
+                    <div className="block md:hidden mt-1">
+                      <MobileEventDots events={dayEvents} />
+                    </div>
+                  )}
 
                   {/* Tablet: 2 events */}
                   {dayEvents.length > 0 && (
@@ -355,10 +354,12 @@ export default function CalendarPage() {
 
                 {/* Net amount at bottom - tablet/desktop only */}
                 {dayEvents.length > 0 && (
-                  <div className={cn(
-                    'text-xs font-mono text-center border-t border-border/50 pt-0.5 hidden md:block pb-1',
-                    netAmount >= 0 ? 'text-emerald-600' : 'text-destructive'
-                  )}>
+                  <div
+                    className={cn(
+                      'text-xs font-mono text-center border-t border-border/50 pt-0.5 hidden md:block pb-1',
+                      netAmount >= 0 ? 'text-emerald-600' : 'text-destructive'
+                    )}
+                  >
                     {netAmount >= 0 ? '+' : '-'}${Math.abs(netAmount).toFixed(2)}
                   </div>
                 )}

@@ -35,8 +35,8 @@ export function parseExcelData(file: File): Promise<ImportResult> {
 
       // Split by lines and parse CSV-like format
       // This handles both actual CSV and tab-delimited Excel exports
-      const lines = (data as string).split('\n').filter(line => line.trim());
-      
+      const lines = (data as string).split('\n').filter((line) => line.trim());
+
       const result: ImportResult = {
         rules: [],
         transactions: [],
@@ -51,21 +51,22 @@ export function parseExcelData(file: File): Promise<ImportResult> {
 
       // Detect delimiter
       const firstLine = lines[0];
-      const hasCommas = (firstLine.match(/,/g) || []).length > (firstLine.match(/\t/g) || []).length;
+      const hasCommas =
+        (firstLine.match(/,/g) || []).length > (firstLine.match(/\t/g) || []).length;
       const delimiter = hasCommas ? ',' : '\t';
 
       // Parse header
-      const headers = lines[0].split(delimiter).map(h => h.trim().toLowerCase());
+      const headers = lines[0].split(delimiter).map((h) => h.trim().toLowerCase());
 
       // Look for budget rules section
       let sectionStart = 1;
-      
+
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
 
-        const values = line.split(delimiter).map(v => v.trim());
-        
+        const values = line.split(delimiter).map((v) => v.trim());
+
         // Skip if not enough values
         if (values.length < 3) {
           if (values[0] && values[0].toLowerCase() === 'name') {
@@ -149,7 +150,10 @@ function parseFrequency(freq: string | undefined): 'weekly' | 'bi-weekly' | 'mon
   return 'monthly'; // Default
 }
 
-function parseRecurrenceDay(dayStr: string | undefined, frequency: string | undefined): number | null {
+function parseRecurrenceDay(
+  dayStr: string | undefined,
+  frequency: string | undefined
+): number | null {
   if (!dayStr) return null;
   const day = parseInt(dayStr);
   if (isNaN(day) || day < 0 || day > 31) return null;
@@ -158,7 +162,7 @@ function parseRecurrenceDay(dayStr: string | undefined, frequency: string | unde
 
 function parseDate(dateStr: string | undefined): string {
   if (!dateStr) return new Date().toISOString().split('T')[0];
-  
+
   // Try common date formats
   const date = new Date(dateStr);
   if (!isNaN(date.getTime())) {
@@ -180,9 +184,9 @@ export function validateImportResult(result: ImportResult): {
   warnings: string[];
 } {
   const warnings: string[] = [];
-  
+
   // Check for duplicate rule names
-  const ruleNames = result.rules.map(r => r.name.toLowerCase());
+  const ruleNames = result.rules.map((r) => r.name.toLowerCase());
   const duplicates = ruleNames.filter((name, index) => ruleNames.indexOf(name) !== index);
   if (duplicates.length > 0) {
     warnings.push(`Duplicate rule names: ${Array.from(new Set(duplicates)).join(', ')}`);
@@ -190,7 +194,7 @@ export function validateImportResult(result: ImportResult): {
 
   // Check for future dates
   const now = new Date();
-  result.rules.forEach(rule => {
+  result.rules.forEach((rule) => {
     if (rule.end_date) {
       const endDate = new Date(rule.end_date);
       if (endDate < now) {
@@ -200,14 +204,16 @@ export function validateImportResult(result: ImportResult): {
   });
 
   // Check for reasonable amounts
-  result.rules.forEach(rule => {
+  result.rules.forEach((rule) => {
     if (rule.amount > 1000000) {
-      warnings.push(`Suspiciously large amount for "${rule.name}": $${rule.amount.toLocaleString()}`);
+      warnings.push(
+        `Suspiciously large amount for "${rule.name}": $${rule.amount.toLocaleString()}`
+      );
     }
   });
 
   return {
-    valid: warnings.length === 0 || (result.rules.length > 0 || result.transactions.length > 0),
+    valid: warnings.length === 0 || result.rules.length > 0 || result.transactions.length > 0,
     warnings,
   };
 }

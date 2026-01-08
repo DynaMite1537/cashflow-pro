@@ -8,7 +8,7 @@ import { useBudgetStore } from '@/store/useBudgetStore';
  */
 export function generateSampleData() {
   const today = new Date();
-  
+
   return {
     currentBalance: 473.69, // Starting balance from simulation
     rules: generateSampleRules(today),
@@ -23,7 +23,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-pay-lm',
       name: 'PAY-LM',
-      amount: 1453.00,
+      amount: 1453.0,
       type: 'income',
       category: 'other',
       frequency: 'weekly',
@@ -39,7 +39,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-rent',
       name: 'Rent',
-      amount: 1733.00,
+      amount: 1733.0,
       type: 'expense',
       category: 'housing',
       frequency: 'monthly',
@@ -67,7 +67,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-mom-rent',
       name: 'Mom Rent',
-      amount: 850.00,
+      amount: 850.0,
       type: 'expense',
       category: 'housing',
       frequency: 'monthly',
@@ -81,7 +81,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-groceries',
       name: 'Groceries',
-      amount: 300.00,
+      amount: 300.0,
       type: 'expense',
       category: 'food',
       frequency: 'monthly',
@@ -95,7 +95,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-savings',
       name: 'Savings',
-      amount: 1000.00,
+      amount: 1000.0,
       type: 'expense', // Transfer out = expense from checking perspective
       category: 'other',
       frequency: 'monthly',
@@ -109,7 +109,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-att',
       name: 'AT&T',
-      amount: 65.00,
+      amount: 65.0,
       type: 'expense',
       category: 'utilities',
       frequency: 'monthly',
@@ -123,7 +123,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-ga-power',
       name: 'GA Power',
-      amount: 70.00,
+      amount: 70.0,
       type: 'expense',
       category: 'utilities',
       frequency: 'monthly',
@@ -137,7 +137,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-th',
       name: 'TH',
-      amount: 400.00,
+      amount: 400.0,
       type: 'expense',
       category: 'other',
       frequency: 'monthly',
@@ -181,7 +181,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-netflix',
       name: 'Netflix',
-      amount: 24.60,
+      amount: 24.6,
       type: 'expense',
       category: 'subscription',
       frequency: 'monthly',
@@ -209,7 +209,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-rocket-money',
       name: 'Rocket Money',
-      amount: 6.00,
+      amount: 6.0,
       type: 'expense',
       category: 'subscription',
       frequency: 'monthly',
@@ -223,7 +223,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-little4much',
       name: 'Little4Much',
-      amount: 150.00,
+      amount: 150.0,
       type: 'expense',
       category: 'subscription',
       frequency: 'monthly',
@@ -253,7 +253,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-car-insurance',
       name: 'Car Insurance',
-      amount: 1999.10,
+      amount: 1999.1,
       type: 'expense',
       category: 'transport',
       frequency: 'yearly',
@@ -267,7 +267,7 @@ function generateSampleRules(today: Date): BudgetRule[] {
     {
       id: 'rule-phone-bill-annual',
       name: 'Phone Bill (Annual)',
-      amount: 300.00,
+      amount: 300.0,
       type: 'expense',
       category: 'utilities',
       frequency: 'yearly',
@@ -299,7 +299,7 @@ function generateSampleTransactions(today: Date): OneTimeTransaction[] {
       id: 'trans-chase',
       date: new Date('2024-12-04'),
       description: 'Chase Credit Card Payment',
-      amount: 406.00,
+      amount: 406.0,
       type: 'expense',
       is_reconciled: true,
       created_at: new Date('2024-12-04'),
@@ -309,7 +309,7 @@ function generateSampleTransactions(today: Date): OneTimeTransaction[] {
       id: 'trans-nfcu',
       date: new Date('2024-12-06'),
       description: 'NFCU Credit Card Payment',
-      amount: 72.00,
+      amount: 72.0,
       type: 'expense',
       is_reconciled: true,
       created_at: new Date('2024-12-06'),
@@ -320,18 +320,22 @@ function generateSampleTransactions(today: Date): OneTimeTransaction[] {
 
 export function loadSampleData() {
   const data = generateSampleData();
-  
+
   // Load into store
   const { setBalance, setRules, setTransactions } = useBudgetStore.getState();
-  
+
   setBalance(data.currentBalance);
   setRules(data.rules);
   setTransactions(data.transactions);
-  
+
   return {
     rules: data.rules.length,
     transactions: data.transactions.length,
-    totalIncome: data.rules.filter(r => r.type === 'income').reduce((sum, r) => sum + r.amount, 0),
-    totalExpenses: data.rules.filter(r => r.type === 'expense').reduce((sum, r) => sum + r.amount, 0),
+    totalIncome: data.rules
+      .filter((r) => r.type === 'income')
+      .reduce((sum, r) => sum + r.amount, 0),
+    totalExpenses: data.rules
+      .filter((r) => r.type === 'expense')
+      .reduce((sum, r) => sum + r.amount, 0),
   };
 }

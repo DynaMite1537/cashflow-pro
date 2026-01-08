@@ -27,12 +27,12 @@ export const UpcomingTransactions = memo(function UpcomingTransactions({
     const endDate = today.add(days, 'day');
 
     return simulation
-      .filter(day => {
+      .filter((day) => {
         const dayDate = dayjs(day.date);
         return dayDate.isAfter(today) || dayDate.isSame(today);
       })
-      .filter(day => day.transactions.length > 0)
-      .sort((a, b) => dayjs(a.date).isAfter(dayjs(b.date)) ? 1 : -1)
+      .filter((day) => day.transactions.length > 0)
+      .sort((a, b) => (dayjs(a.date).isAfter(dayjs(b.date)) ? 1 : -1))
       .slice(0, days);
   }, [simulation, days]) as DailySimulationResult[];
 
@@ -93,15 +93,19 @@ export const UpcomingTransactions = memo(function UpcomingTransactions({
               {/* Day Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className={cn(
-                    'text-sm font-semibold',
-                    isToday ? 'text-primary' : 'text-foreground'
-                  )}>
-                    {isToday ? 'Today' : isTomorrow ? 'Tomorrow' : dayjs(day.date).format('ddd, MMM D')}
+                  <span
+                    className={cn(
+                      'text-sm font-semibold',
+                      isToday ? 'text-primary' : 'text-foreground'
+                    )}
+                  >
+                    {isToday
+                      ? 'Today'
+                      : isTomorrow
+                        ? 'Tomorrow'
+                        : dayjs(day.date).format('ddd, MMM D')}
                   </span>
-                  {day.hasOverride && (
-                    <AlertCircle size={14} className="text-amber-600" />
-                  )}
+                  {day.hasOverride && <AlertCircle size={14} className="text-amber-600" />}
                 </div>
                 <div className="flex items-center gap-3">
                   {/* Net Change */}
@@ -111,10 +115,12 @@ export const UpcomingTransactions = memo(function UpcomingTransactions({
                     ) : (
                       <TrendingDown size={14} className="text-destructive" />
                     )}
-                    <span className={cn(
-                      'text-xs font-mono font-semibold',
-                      day.netChange >= 0 ? 'text-emerald-600' : 'text-destructive'
-                    )}>
+                    <span
+                      className={cn(
+                        'text-xs font-mono font-semibold',
+                        day.netChange >= 0 ? 'text-emerald-600' : 'text-destructive'
+                      )}
+                    >
                       {day.netChange >= 0 ? '+' : ''}${day.netChange.toFixed(2)}
                     </span>
                   </div>
@@ -137,14 +143,14 @@ export const UpcomingTransactions = memo(function UpcomingTransactions({
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {getTransactionIcon(transaction)}
-                        <span className="truncate text-foreground">
-                          {transaction.name}
-                        </span>
+                        <span className="truncate text-foreground">{transaction.name}</span>
                       </div>
-                      <span className={cn(
-                        'font-mono font-medium flex-shrink-0 ml-2',
-                        isIncome ? 'text-emerald-600' : 'text-destructive'
-                      )}>
+                      <span
+                        className={cn(
+                          'font-mono font-medium flex-shrink-0 ml-2',
+                          isIncome ? 'text-emerald-600' : 'text-destructive'
+                        )}
+                      >
                         {isIncome ? '+' : '-'}${transaction.amount.toFixed(2)}
                       </span>
                     </div>
@@ -155,10 +161,12 @@ export const UpcomingTransactions = memo(function UpcomingTransactions({
               {/* Day Balance */}
               <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
                 <span className="text-xs text-muted-foreground">Ending Balance</span>
-                <span className={cn(
-                  'text-sm font-mono font-bold',
-                  isNegative ? 'text-destructive' : 'text-foreground'
-                )}>
+                <span
+                  className={cn(
+                    'text-sm font-mono font-bold',
+                    isNegative ? 'text-destructive' : 'text-foreground'
+                  )}
+                >
                   ${day.endingBalance.toFixed(2)}
                 </span>
               </div>

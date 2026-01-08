@@ -74,10 +74,7 @@ export function MobileBottomNav() {
               className={`
                 flex flex-col items-center justify-center w-full h-full
                 transition-colors gap-1
-                ${isActive
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-                }
+                ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}
               `}
             >
               <Icon size={20} className={isActive ? 'text-primary' : ''} />

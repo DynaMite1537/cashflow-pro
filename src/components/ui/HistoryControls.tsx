@@ -13,12 +13,14 @@ export const HistoryControls = memo(function HistoryControls() {
   }, []);
 
   // Use initial empty state on server to avoid hydration mismatch
-  const displayState = mounted ? temporalState : {
-    pastStates: [],
-    futureStates: [],
-    undo: () => {},
-    redo: () => {},
-  };
+  const displayState = mounted
+    ? temporalState
+    : {
+        pastStates: [],
+        futureStates: [],
+        undo: () => {},
+        redo: () => {},
+      };
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-popover border border-border shadow-lg rounded-full px-4 py-2 flex items-center gap-4 z-50">

@@ -16,7 +16,7 @@ export function TransactionRow({
   style,
   transactions,
   onDelete,
-  onToggleReconciled
+  onToggleReconciled,
 }: {
   index: number;
   style: React.CSSProperties;
@@ -28,10 +28,12 @@ export function TransactionRow({
     <div style={style} className="border-b border-border hover:bg-muted/50 transition-colors group">
       <div className="flex items-center gap-4 p-4">
         {/* Type Icon */}
-        <div className={cn(
-          'w-10 h-10 rounded-full flex items-center justify-center',
-          isIncome ? 'bg-emerald-500/10' : 'bg-destructive/10'
-        )}>
+        <div
+          className={cn(
+            'w-10 h-10 rounded-full flex items-center justify-center',
+            isIncome ? 'bg-emerald-500/10' : 'bg-destructive/10'
+          )}
+        >
           {isIncome ? (
             <ArrowUpCircle className="h-5 w-5 text-emerald-600" />
           ) : (
@@ -41,10 +43,12 @@ export function TransactionRow({
 
         {/* Details */}
         <div className="flex-1 min-w-0">
-          <p className={cn(
-            'font-medium truncate text-sm',
-            isIncome ? 'text-foreground' : 'text-foreground'
-          )}>
+          <p
+            className={cn(
+              'font-medium truncate text-sm',
+              isIncome ? 'text-foreground' : 'text-foreground'
+            )}
+          >
             {transaction.description || 'No description'}
           </p>
           <div className="flex items-center gap-2 mt-1">
@@ -53,7 +57,7 @@ export function TransactionRow({
               {new Date(transaction.date).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
-                year: 'numeric'
+                year: 'numeric',
               })}
             </span>
             {transaction.is_reconciled && (
@@ -64,10 +68,12 @@ export function TransactionRow({
 
         {/* Amount */}
         <div className="text-right">
-          <p className={cn(
-            'text-lg font-bold font-mono',
-            isIncome ? 'text-emerald-600' : 'text-destructive'
-          )}>
+          <p
+            className={cn(
+              'text-lg font-bold font-mono',
+              isIncome ? 'text-emerald-600' : 'text-destructive'
+            )}
+          >
             {isIncome ? '+' : '-'}
             {formatCurrency(transaction.amount)}
           </p>

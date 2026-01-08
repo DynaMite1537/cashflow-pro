@@ -100,7 +100,10 @@ export function AddCardModal({ isOpen, card, onClose }: AddCardModalProps) {
 
   return (
     isOpen && (
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div
+        className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
         <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">
@@ -116,9 +119,7 @@ export function AddCardModal({ isOpen, card, onClose }: AddCardModalProps) {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Card Name */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Card Name
-              </label>
+              <label className="block text-sm font-medium text-foreground mb-2">Card Name</label>
               <input
                 type="text"
                 value={name}
@@ -152,7 +153,9 @@ export function AddCardModal({ isOpen, card, onClose }: AddCardModalProps) {
                   Current Balance
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    $
+                  </span>
                   <input
                     type="number"
                     value={balance}
@@ -170,7 +173,9 @@ export function AddCardModal({ isOpen, card, onClose }: AddCardModalProps) {
                   Credit Limit
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    $
+                  </span>
                   <input
                     type="number"
                     value={limit}
@@ -201,9 +206,7 @@ export function AddCardModal({ isOpen, card, onClose }: AddCardModalProps) {
 
             {/* Color */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Card Color
-              </label>
+              <label className="block text-sm font-medium text-foreground mb-2">Card Color</label>
               <div className="flex gap-3">
                 {cardColors.map((colorOption) => (
                   <button

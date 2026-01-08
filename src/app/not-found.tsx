@@ -15,7 +15,7 @@ export default function NotFound() {
       <div className="text-center space-y-4 max-w-md">
         <h1 className="text-4xl font-bold text-foreground">Page Not Found</h1>
         <p className="text-lg text-muted-foreground">
-          Sorry, we couldn't find the page you're looking for.
+          Sorry, we couldn&apos;t find the page you&apos;re looking for.
         </p>
 
         {/* Suggestions */}
@@ -24,7 +24,7 @@ export default function NotFound() {
           <ul className="list-disc list-inside space-y-1 text-left mt-4">
             <li>Check the URL and try again</li>
             <li>Use the navigation to go to a valid page</li>
-            <li>Try searching for what you're looking for</li>
+            <li>Try searching for what you&apos;re looking for</li>
           </ul>
         </div>
 

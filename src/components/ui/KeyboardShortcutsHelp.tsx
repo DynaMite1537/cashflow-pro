@@ -93,13 +93,16 @@ export function KeyboardShortcutsHelp() {
   }
 
   // Group shortcuts by category
-  const groupedShortcuts = defaultShortcuts.reduce((acc, shortcut) => {
-    if (!acc[shortcut.category]) {
-      acc[shortcut.category] = [];
-    }
-    acc[shortcut.category].push(shortcut);
-    return acc;
-  }, {} as Record<string, Shortcut[]>);
+  const groupedShortcuts = defaultShortcuts.reduce(
+    (acc, shortcut) => {
+      if (!acc[shortcut.category]) {
+        acc[shortcut.category] = [];
+      }
+      acc[shortcut.category].push(shortcut);
+      return acc;
+    },
+    {} as Record<string, Shortcut[]>
+  );
 
   return (
     <div
@@ -136,13 +139,8 @@ export function KeyboardShortcutsHelp() {
                 </div>
                 <div className="space-y-2">
                   {shortcuts.map((shortcut, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start justify-between gap-4 text-sm"
-                    >
-                      <span className="text-muted-foreground flex-1">
-                        {shortcut.description}
-                      </span>
+                    <div key={idx} className="flex items-start justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground flex-1">{shortcut.description}</span>
                       <div className="flex gap-2 flex-shrink-0">
                         {shortcut.keys.map((key, keyIdx) => (
                           <kbd
@@ -165,7 +163,11 @@ export function KeyboardShortcutsHelp() {
             <p className="flex items-start gap-2">
               <span className="flex-shrink-0">💡</span>
               <span>
-                Tip: Shortcuts don't work when typing in input fields. Press <kbd className="px-1.5 py-0.5 bg-background border border-border rounded font-mono text-xs">Escape</kbd> to close this dialog.
+                Tip: Shortcuts don&apos;t work when typing in input fields. Press{' '}
+                <kbd className="px-1.5 py-0.5 bg-background border border-border rounded font-mono text-xs">
+                  Escape
+                </kbd>{' '}
+                to close this dialog.
               </span>
             </p>
           </div>

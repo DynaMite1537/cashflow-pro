@@ -45,14 +45,11 @@ export interface OneTimeTransaction {
   created_at: Date;
   updated_at: Date;
   // Override fields for calendar adjustments to recurring rules
-  override_rule_id?: string | null;  // Links to the rule being overridden
-  is_override?: boolean;             // Flag to identify override transactions
+  override_rule_id?: string | null; // Links to the rule being overridden
+  is_override?: boolean; // Flag to identify override transactions
 }
 
-export type OneTimeTransactionInput = Omit<
-  OneTimeTransaction,
-  'id' | 'created_at' | 'updated_at'
->;
+export type OneTimeTransactionInput = Omit<OneTimeTransaction, 'id' | 'created_at' | 'updated_at'>;
 
 // ============== Balance Checkpoint ==============
 export interface BalanceCheckpoint {
@@ -72,7 +69,7 @@ export interface SimulationTransaction {
   type: TransactionType;
   source: 'rule' | 'one-time' | 'override';
   ruleId?: string;
-  isOverride?: boolean;  // Flag to identify override transactions in simulation
+  isOverride?: boolean; // Flag to identify override transactions in simulation
 }
 
 export interface DailySimulationResult {
@@ -83,7 +80,7 @@ export interface DailySimulationResult {
   endingBalance: number;
   isCheckpoint: boolean;
   isLowestPoint: boolean;
-  hasOverride?: boolean;  // Flag to indicate this day has manual adjustments
+  hasOverride?: boolean; // Flag to indicate this day has manual adjustments
 }
 
 // ============== User Profile ==============
@@ -125,14 +122,14 @@ export interface FilterType {
 // ============== Credit Card Types ==============
 export interface CreditCard {
   id: string;
-  name: string;              // "Chase Sapphire", "Amex Gold"
-  last4: string;             // Last 4 digits: "1234"
-  balance: number;              // Current balance owed
-  limit: number;               // Credit limit
-  dueDate: Date;              // Specific next due date
-  color?: string;              // Card identification color
-  annualFee?: number;           // Optional annual fee
-  isActive: boolean;            // Toggle tracking on/off
+  name: string; // "Chase Sapphire", "Amex Gold"
+  last4: string; // Last 4 digits: "1234"
+  balance: number; // Current balance owed
+  limit: number; // Credit limit
+  dueDate: Date; // Specific next due date
+  color?: string; // Card identification color
+  annualFee?: number; // Optional annual fee
+  isActive: boolean; // Toggle tracking on/off
   created_at: Date;
   updated_at: Date;
 }
@@ -162,4 +159,3 @@ export interface CalendarEvent {
   isOverride?: boolean;
   originalAmount?: number;
 }
-

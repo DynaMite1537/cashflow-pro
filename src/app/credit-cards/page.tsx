@@ -47,7 +47,9 @@ export default function CreditCardsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Credit Cards</h1>
-        <p className="text-muted-foreground">Track your credit card balances, payments, and utilization</p>
+        <p className="text-muted-foreground">
+          Track your credit card balances, payments, and utilization
+        </p>
       </div>
 
       {/* Summary Cards */}
@@ -58,7 +60,11 @@ export default function CreditCardsPage() {
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Total Balance</p>
               <p className="text-2xl font-bold text-foreground">
-                ${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                $
+                {totalBalance.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
             <CreditCardIcon className="w-8 h-8 text-primary" />
@@ -71,7 +77,11 @@ export default function CreditCardsPage() {
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Total Limit</p>
               <p className="text-2xl font-bold text-foreground">
-                ${totalLimit.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                $
+                {totalLimit.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
               </p>
             </div>
             <TrendingUp className="w-8 h-8 text-green-600" />
@@ -83,7 +93,9 @@ export default function CreditCardsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Overall Utilization</p>
-              <p className={`text-2xl font-bold ${totalUtilization > 80 ? 'text-red-500' : totalUtilization > 50 ? 'text-yellow-500' : 'text-green-500'}`}>
+              <p
+                className={`text-2xl font-bold ${totalUtilization > 80 ? 'text-red-500' : totalUtilization > 50 ? 'text-yellow-500' : 'text-green-500'}`}
+              >
                 {totalUtilization.toFixed(1)}%
               </p>
             </div>
@@ -146,11 +158,7 @@ export default function CreditCardsPage() {
       </div>
 
       {/* Add/Edit Modal */}
-      <AddCardModal
-        isOpen={isAddModalOpen}
-        card={editingCard}
-        onClose={handleCloseAddModal}
-      />
+      <AddCardModal isOpen={isAddModalOpen} card={editingCard} onClose={handleCloseAddModal} />
 
       {/* Payment Form Modal */}
       <PaymentForm

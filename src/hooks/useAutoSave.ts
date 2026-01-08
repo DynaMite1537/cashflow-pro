@@ -8,19 +8,10 @@ import { SaveStatus } from '@/types';
  * Watches state changes and triggers API calls after debounce period (1 second)
  */
 export function useAutoSave() {
-  const {
-    currentBalance,
-    rules,
-    transactions,
-    checkpoints,
-    setSaveStatus
-  } = useBudgetStore();
+  const { currentBalance, rules, transactions, checkpoints, setSaveStatus } = useBudgetStore();
 
   // Debounce data - only save after 1 second of no changes
-  const [debouncedData] = useDebounce(
-    { currentBalance, rules, transactions, checkpoints },
-    1000
-  );
+  const [debouncedData] = useDebounce({ currentBalance, rules, transactions, checkpoints }, 1000);
 
   // Track if we're currently saving to prevent overlapping saves
   const isSavingRef = useRef(false);
@@ -42,7 +33,7 @@ export function useAutoSave() {
         console.log('Auto-saving data:', debouncedData);
 
         // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         setSaveStatus('saved');
 

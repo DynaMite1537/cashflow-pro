@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { toastError } from '@/lib/toast';
 
@@ -9,13 +10,7 @@ interface Error {
   stack?: string;
 }
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export default function Error({ error, reset }: { error: Error; reset: () => void }) {
   useEffect(() => {
     console.error('Application Error:', error);
     toastError('An error occurred', error.message);
@@ -34,9 +29,7 @@ export default function Error({
         {/* Error Message */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-foreground">Oops! Something went wrong</h1>
-          <p className="text-muted-foreground">
-            {error.message || 'An unexpected error occurred'}
-          </p>
+          <p className="text-muted-foreground">{error.message || 'An unexpected error occurred'}</p>
         </div>
 
         {/* Actions */}
@@ -52,13 +45,13 @@ export default function Error({
             Try Again
           </button>
 
-          <a
+          <Link
             href="/"
             className="w-full flex items-center justify-center gap-2 bg-card text-foreground py-3 rounded-lg font-medium border border-border hover:bg-accent transition-colors"
           >
             <Home size={18} />
             Go Home
-          </a>
+          </Link>
         </div>
 
         {/* Stack Trace (development only) */}

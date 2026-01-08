@@ -26,7 +26,11 @@ interface BalanceChartProps {
   onDotClick?: (date: Date) => void;
 }
 
-export const BalanceChart = memo(function BalanceChart({ data, height = 400, onDotClick }: BalanceChartProps) {
+export const BalanceChart = memo(function BalanceChart({
+  data,
+  height = 400,
+  onDotClick,
+}: BalanceChartProps) {
   // Transform data for Recharts
   const chartData = data.map((day) => ({
     date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -41,7 +45,7 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
     isLowestPoint: day.isLowestPoint,
   }));
 
-  const minBalance = Math.min(...chartData.map(d => d.balance));
+  const minBalance = Math.min(...chartData.map((d) => d.balance));
   const hasNegative = minBalance < 0;
 
   // Custom dot function to show different colors for override days
@@ -130,8 +134,14 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
           <div className="space-y-2 mb-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Balance</span>
-              <span className={`text-sm font-mono font-bold ${isNegative ? 'text-destructive' : 'text-foreground'}`}>
-                ${data.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <span
+                className={`text-sm font-mono font-bold ${isNegative ? 'text-destructive' : 'text-foreground'}`}
+              >
+                $
+                {data.balance.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
 
@@ -144,7 +154,9 @@ export const BalanceChart = memo(function BalanceChart({ data, height = 400, onD
                 ) : (
                   <TrendingDown size={12} className="text-destructive" />
                 )}
-                <span className={`text-xs font-mono ${netPositive ? 'text-emerald-600' : 'text-destructive'}`}>
+                <span
+                  className={`text-xs font-mono ${netPositive ? 'text-emerald-600' : 'text-destructive'}`}
+                >
                   {netPositive ? '+' : ''}${data.netChange.toFixed(2)}
                 </span>
               </div>

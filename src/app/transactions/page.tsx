@@ -1,7 +1,16 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, Filter, ArrowDownCircle, ArrowUpCircle, Trash2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Trash2,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { toastSuccess, toastError } from '@/lib/toast';
 import { formatCurrency } from '@/lib/dateUtils';
@@ -35,7 +44,7 @@ export default function TransactionsPage() {
     })
     .sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case 'date':
           comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -47,7 +56,7 @@ export default function TransactionsPage() {
           comparison = (a.description || '').localeCompare(b.description || '');
           break;
       }
-      
+
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
@@ -78,16 +87,20 @@ export default function TransactionsPage() {
   };
 
   const handlePreviousPage = () => {
-    setCurrentPage(prev => Math.max(1, prev - 1));
+    setCurrentPage((prev) => Math.max(1, prev - 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
   };
 
   // Calculate stats
-  const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = filteredTransactions
+    .filter((t) => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = filteredTransactions
+    .filter((t) => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <div className="space-y-6">
@@ -95,9 +108,7 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Transactions</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage one-time income and expenses
-          </p>
+          <p className="text-muted-foreground mt-1">Manage one-time income and expenses</p>
         </div>
       </div>
 
@@ -105,15 +116,11 @@ export default function TransactionsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-lg p-4">
           <p className="text-sm text-muted-foreground mb-1">Income</p>
-          <p className="text-2xl font-bold text-emerald-600">
-            +{formatCurrency(totalIncome)}
-          </p>
+          <p className="text-2xl font-bold text-emerald-600">+{formatCurrency(totalIncome)}</p>
         </div>
         <div className="bg-card border border-border rounded-lg p-4">
           <p className="text-sm text-muted-foreground mb-1">Expenses</p>
-          <p className="text-2xl font-bold text-destructive">
-            -{formatCurrency(totalExpenses)}
-          </p>
+          <p className="text-2xl font-bold text-destructive">-{formatCurrency(totalExpenses)}</p>
         </div>
       </div>
 
@@ -185,9 +192,13 @@ export default function TransactionsPage() {
 
       {/* Transactions Count & Pagination Info */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <p>Showing {paginatedTransactions.length} of {filteredTransactions.length} transactions</p>
+        <p>
+          Showing {paginatedTransactions.length} of {filteredTransactions.length} transactions
+        </p>
         {totalPages > 1 && (
-          <p>Page {currentPage} of {totalPages}</p>
+          <p>
+            Page {currentPage} of {totalPages}
+          </p>
         )}
       </div>
 

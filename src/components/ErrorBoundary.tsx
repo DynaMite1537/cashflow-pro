@@ -55,7 +55,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
         };
       }
     }
-    
+
     // Default error
     return {
       hasError: true,
@@ -95,16 +95,15 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
             {/* Error Content */}
             <div className="space-y-2">
               <h1 className="text-2xl font-bold text-foreground">Something went wrong</h1>
-              
+
               {this.state.errorInfo && (
-                <p className="text-muted-foreground">
-                  {this.state.errorInfo}
-                </p>
+                <p className="text-muted-foreground">{this.state.errorInfo}</p>
               )}
 
               {!this.state.errorInfo && (
                 <p className="text-muted-foreground">
-                  {this.state.error?.toString() || 'An unexpected error occurred while rendering this page.'}
+                  {this.state.error?.toString() ||
+                    'An unexpected error occurred while rendering this page.'}
                 </p>
               )}
 

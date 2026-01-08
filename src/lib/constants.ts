@@ -20,21 +20,16 @@ export const BUDGET_CATEGORIES = [
   'entertainment',
   'debt',
   'subscription',
-  'other'
+  'other',
 ] as const;
 
-export type BudgetCategory = typeof BUDGET_CATEGORIES[number];
+export type BudgetCategory = (typeof BUDGET_CATEGORIES)[number];
 
 // ============== Frequencies ==============
 
-export const FREQUENCIES = [
-  'weekly',
-  'bi-weekly',
-  'monthly',
-  'yearly'
-] as const;
+export const FREQUENCIES = ['weekly', 'bi-weekly', 'monthly', 'yearly'] as const;
 
-export type Frequency = typeof FREQUENCIES[number];
+export type Frequency = (typeof FREQUENCIES)[number];
 
 // Frequency labels for display
 export const FREQUENCY_LABELS: Record<Frequency, string> = {
@@ -54,12 +49,22 @@ export const DEFAULT_START_BALANCE = 0;
 export const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
 export const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ] as const;
 
 // ============== Category Colors (HSL values) ==============
-// These match the CSS variables in globals.css
+// These match to CSS variables in globals.css
 
 export const CATEGORY_COLORS: Record<BudgetCategory, string> = {
   housing: '217 91% 60%',
@@ -84,17 +89,78 @@ export const CATEGORY_COLORS_LIGHT: Record<BudgetCategory, string> = {
   other: '0 0% 50%',
 };
 
+// Tailwind class strings for category badges
+export const CATEGORY_COLOR_CLASSES: Record<BudgetCategory, string> = {
+  housing:
+    'bg-[hsl(var(--category-housing))]/10 text-[hsl(var(--category-housing))] border-[hsl(var(--category-housing))/20]',
+  transport:
+    'bg-[hsl(var(--category-transport))]/10 text-[hsl(var(--category-transport))] border-[hsl(var(--category-transport))/20]',
+  utilities:
+    'bg-[hsl(var(--category-utilities))]/10 text-[hsl(var(--category-utilities))] border-[hsl(var(--category-utilities))/20]',
+  food: 'bg-[hsl(var(--category-food))]/10 text-[hsl(var(--category-food))] border-[hsl(var(--category-food))/20]',
+  entertainment:
+    'bg-[hsl(var(--category-entertainment))]/10 text-[hsl(var(--category-entertainment))] border-[hsl(var(--category-entertainment))/20]',
+  debt: 'bg-[hsl(var(--category-debt))]/10 text-[hsl(var(--category-debt))] border-[hsl(var(--category-debt))/20]',
+  subscription:
+    'bg-[hsl(var(--category-subscription))]/10 text-[hsl(var(--category-subscription))] border-[hsl(var(--category-subscription))/20]',
+  other:
+    'bg-[hsl(var(--category-other))]/10 text-[hsl(var(--category-other))] border-[hsl(var(--category-other))/20]',
+};
+
 // ============== Card Types ==============
 
-export const CREDIT_CARD_TYPES = [
-  'visa',
-  'mastercard',
-  'amex',
-  'discover',
-  'other'
-] as const;
+export const CREDIT_CARD_TYPES = ['visa', 'mastercard', 'amex', 'discover', 'other'] as const;
 
-export type CreditCardType = typeof CREDIT_CARD_TYPES[number];
+export type CreditCardType = (typeof CREDIT_CARD_TYPES)[number];
+
+// ============== Credit Card Colors ==============
+
+// Utilization bar colors based on percentage
+export const UTILIZATION_COLORS = {
+  high: 'bg-red-500',
+  medium: 'bg-yellow-500',
+  low: 'bg-green-500',
+} as const;
+
+export type UtilizationColor = keyof typeof UTILIZATION_COLORS;
+
+// Get utilization color class based on percentage
+export const getUtilizationColor = (utilization: number): UtilizationColor => {
+  if (utilization > 80) return 'high';
+  if (utilization > 50) return 'medium';
+  return 'low';
+};
+
+// Text colors for utilization percentages
+export const UTILIZATION_TEXT_COLORS = {
+  high: 'text-red-500',
+  medium: 'text-yellow-500',
+  low: 'text-green-500',
+} as const;
+
+export const getUtilizationTextColor = (utilization: number): string => {
+  if (utilization > 80) return UTILIZATION_TEXT_COLORS.high;
+  if (utilization > 50) return UTILIZATION_TEXT_COLORS.medium;
+  return UTILIZATION_TEXT_COLORS.low;
+};
+
+// Due date urgency colors
+export const DUE_DATE_URGENCY_COLORS = {
+  overdue: 'text-red-500',
+  critical: 'text-orange-500',
+  warning: 'text-yellow-500',
+  safe: 'text-green-500',
+} as const;
+
+export type DueDateUrgency = keyof typeof DUE_DATE_URGENCY_COLORS;
+
+// Get due date urgency color class based on days until due
+export const getDueDateUrgencyColor = (daysUntilDue: number): string => {
+  if (daysUntilDue <= 0) return DUE_DATE_URGENCY_COLORS.overdue;
+  if (daysUntilDue <= 3) return DUE_DATE_URGENCY_COLORS.critical;
+  if (daysUntilDue <= 7) return DUE_DATE_URGENCY_COLORS.warning;
+  return DUE_DATE_URGENCY_COLORS.safe;
+};
 
 // ============== Validation Defaults ==============
 

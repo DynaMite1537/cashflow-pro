@@ -23,7 +23,8 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 // Global toast queue for non-component contexts
 let globalToastQueue: Array<{ variant: ToastVariant; title: string; description?: string }> = [];
-let globalAddToast: ((variant: ToastVariant, title: string, description?: string) => void) | null = null;
+let globalAddToast: ((variant: ToastVariant, title: string, description?: string) => void) | null =
+  null;
 
 export function useToast() {
   const context = useContext(ToastContext);
@@ -39,7 +40,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const addToast = useCallback((variant: ToastVariant, title: string, description?: string) => {
     const id = crypto.randomUUID();
     setToasts((prev) => [...prev, { id, variant, title, description }]);
-    
+
     // Auto-remove after 4 seconds
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
@@ -53,7 +54,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   // Register global toast handler and process queue
   if (typeof window !== 'undefined') {
     globalAddToast = addToast;
-    
+
     // Process any queued toasts
     if (globalToastQueue.length > 0) {
       globalToastQueue.forEach(({ variant, title, description }) => {
@@ -71,7 +72,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
-function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast: (id: string) => void }) {
+function ToastContainer({
+  toasts,
+  removeToast,
+}: {
+  toasts: Toast[];
+  removeToast: (id: string) => void;
+}) {
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
       {toasts.map((toast) => (
@@ -102,12 +109,10 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: () => void }) 
       )}
     >
       {icons[toast.variant]}
-      
+
       <div className="flex-1 space-y-1">
         <p className="font-medium text-sm">{toast.title}</p>
-        {toast.description && (
-          <p className="text-sm text-muted-foreground">{toast.description}</p>
-        )}
+        {toast.description && <p className="text-sm text-muted-foreground">{toast.description}</p>}
       </div>
 
       <button

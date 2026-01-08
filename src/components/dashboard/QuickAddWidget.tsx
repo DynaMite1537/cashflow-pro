@@ -25,7 +25,7 @@ export const QuickAddWidget = memo(function QuickAddWidget() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
-    
+
     if (isNaN(numAmount) || numAmount <= 0) return;
 
     addTransaction({
@@ -68,7 +68,9 @@ export const QuickAddWidget = memo(function QuickAddWidget() {
       <form onSubmit={handleSubmit} className="p-4 space-y-4">
         {/* Amount */}
         <div>
-          <label className="text-xs font-semibold text-muted-foreground uppercase mb-1.5 block">Amount</label>
+          <label className="text-xs font-semibold text-muted-foreground uppercase mb-1.5 block">
+            Amount
+          </label>
           <div className="relative">
             <span className="absolute left-3 top-2.5 text-muted-foreground font-mono">$</span>
             <input
@@ -86,7 +88,9 @@ export const QuickAddWidget = memo(function QuickAddWidget() {
 
         {/* Description */}
         <div>
-          <label className="text-xs font-semibold text-muted-foreground uppercase mb-1.5 block">What was it?</label>
+          <label className="text-xs font-semibold text-muted-foreground uppercase mb-1.5 block">
+            What was it?
+          </label>
           <input
             type="text"
             value={description}

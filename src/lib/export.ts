@@ -19,17 +19,18 @@ export async function exportToCSV(data: ExportData, filename: string): Promise<v
   csv += 'Name,Type,Category,Amount,Frequency,Recurrence Day,Start Date,End Date,Active\n';
 
   for (const rule of data.rules) {
-    csv += [
-      `"${rule.name}"`,
-      rule.type,
-      rule.category,
-      rule.amount.toFixed(2),
-      rule.frequency,
-      rule.recurrence_day || '',
-      rule.start_date ? new Date(rule.start_date).toLocaleDateString() : '',
-      rule.end_date ? new Date(rule.end_date).toLocaleDateString() : '',
-      rule.is_active,
-    ].join(',') + '\n';
+    csv +=
+      [
+        `"${rule.name}"`,
+        rule.type,
+        rule.category,
+        rule.amount.toFixed(2),
+        rule.frequency,
+        rule.recurrence_day || '',
+        rule.start_date ? new Date(rule.start_date).toLocaleDateString() : '',
+        rule.end_date ? new Date(rule.end_date).toLocaleDateString() : '',
+        rule.is_active,
+      ].join(',') + '\n';
   }
 
   csv += '\n';
@@ -39,13 +40,14 @@ export async function exportToCSV(data: ExportData, filename: string): Promise<v
   csv += 'Date,Description,Amount,Type,Reconciled\n';
 
   for (const transaction of data.transactions) {
-    csv += [
-      transaction.date ? new Date(transaction.date).toLocaleDateString() : '',
-      `"${transaction.description || ''}"`,
-      transaction.amount.toFixed(2),
-      transaction.type,
-      transaction.is_reconciled,
-    ].join(',') + '\n';
+    csv +=
+      [
+        transaction.date ? new Date(transaction.date).toLocaleDateString() : '',
+        `"${transaction.description || ''}"`,
+        transaction.amount.toFixed(2),
+        transaction.type,
+        transaction.is_reconciled,
+      ].join(',') + '\n';
   }
 
   // Create blob and download

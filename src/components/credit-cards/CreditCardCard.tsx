@@ -1,8 +1,21 @@
 'use client';
 
-import { CreditCard as CreditCardIcon, Edit, Trash2, DollarSign, Calendar, CreditCard } from 'lucide-react';
+import {
+  CreditCard as CreditCardIcon,
+  Edit,
+  Trash2,
+  DollarSign,
+  Calendar,
+  CreditCard,
+} from 'lucide-react';
 import { CreditCard as CreditCardType } from '@/types';
 import { useBudgetStore } from '@/store/useBudgetStore';
+import {
+  getUtilizationColor,
+  getUtilizationTextColor,
+  getDueDateUrgencyColor,
+  UTILIZATION_COLORS,
+} from '@/lib/constants';
 
 interface CreditCardCardProps {
   card: CreditCardType;
@@ -13,7 +26,7 @@ interface CreditCardCardProps {
 export function CreditCardCard({ card, onEdit, onRecordPayment }: CreditCardCardProps) {
   const { deleteCreditCard } = useBudgetStore();
   const utilization = card.limit > 0 ? (card.balance / card.limit) * 100 : 0;
-  const utilizationColor = utilization > 80 ? 'bg-red-500' : utilization > 50 ? 'bg-yellow-500' : 'bg-green-500';
+  const utilizationColor = UTILIZATION_COLORS[getUtilizationColor(utilization)];
 
   // Calculate days until due
   const today = new Date();
@@ -22,24 +35,14 @@ export function CreditCardCard({ card, onEdit, onRecordPayment }: CreditCardCard
   dueDate.setHours(0, 0, 0, 0);
   const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-  const dueDateUrgency =
-    daysUntilDue <= 0
-      ? 'text-red-500'
-      : daysUntilDue <= 3
-        ? 'text-orange-500'
-        : daysUntilDue <= 7
-          ? 'text-yellow-500'
-          : 'text-green-500';
+  const dueDateUrgency = getDueDateUrgencyColor(daysUntilDue);
 
   const cardGradient = `linear-gradient(135deg, ${card.color} 0%, ${card.color}88 100%)`;
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       {/* Card Visual */}
-      <div
-        className="p-6 relative overflow-hidden"
-        style={{ background: cardGradient }}
-      >
+      <div className="p-6 relative overflow-hidden" style={{ background: cardGradient }}>
         <div className="relative z-10">
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -57,13 +60,21 @@ export function CreditCardCard({ card, onEdit, onRecordPayment }: CreditCardCard
             <div className="flex justify-between items-baseline">
               <span className="text-white/70 text-sm">Balance</span>
               <span className="text-white text-2xl font-bold drop-shadow-lg">
-                ${card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                $
+                {card.balance.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
               <span className="text-white/70 text-sm">Limit</span>
               <span className="text-white text-lg font-medium">
-                ${card.limit.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                $
+                {card.limit.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
               </span>
             </div>
           </div>
@@ -79,7 +90,7 @@ export function CreditCardCard({ card, onEdit, onRecordPayment }: CreditCardCard
         <div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-foreground">Utilization</span>
-            <span className={`text-sm font-bold ${utilization > 80 ? 'text-red-500' : utilization > 50 ? 'text-yellow-500' : 'text-green-500'}`}>
+            <span className={`text-sm font-bold ${getUtilizationTextColor(utilization)}`}>
               {utilization.toFixed(1)}%
             </span>
           </div>
@@ -95,9 +106,20 @@ export function CreditCardCard({ card, onEdit, onRecordPayment }: CreditCardCard
         <div className="flex items-center gap-3">
           <Calendar size={18} className={dueDateUrgency} />
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground">Due {new Date(card.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            <p className="text-sm text-muted-foreground">
+              Due{' '}
+              {new Date(card.dueDate).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </p>
             <p className={`text-xs font-medium ${dueDateUrgency}`}>
-              {daysUntilDue <= 0 ? 'Overdue' : daysUntilDue === 1 ? 'Due tomorrow' : `${daysUntilDue} days left`}
+              {daysUntilDue <= 0
+                ? 'Overdue'
+                : daysUntilDue === 1
+                  ? 'Due tomorrow'
+                  : `${daysUntilDue} days left`}
             </p>
           </div>
         </div>

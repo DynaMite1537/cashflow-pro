@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
-import { BudgetRule, OneTimeTransaction, DailySimulationResult, SimulationTransaction } from '@/types';
+import {
+  BudgetRule,
+  OneTimeTransaction,
+  DailySimulationResult,
+  SimulationTransaction,
+} from '@/types';
 import { matchesRecurrence } from './dateUtils';
 
 /**
@@ -34,7 +39,7 @@ export function runSimulation(
     // 1. Check if this date has a checkpoint (Reality Anchor)
     if (checkpoints[dateStr] !== undefined) {
       runningBalance = checkpoints[dateStr];
-      
+
       // Track minimum balance
       if (runningBalance < minimumBalance) {
         minimumBalance = runningBalance;
@@ -58,32 +63,31 @@ export function runSimulation(
     }
 
     // 2. Find matching one-off transactions (including overrides)
-    const dailyOneOffs = oneOffs.filter(t => {
+    const dailyOneOffs = oneOffs.filter((t) => {
       const transactionDate = toISODate(new Date(t.date));
       return transactionDate === dateStr;
     });
 
     // 2a. Separate override transactions from regular one-offs
-    const overrideTransactions = dailyOneOffs.filter(t => t.is_override);
-    const regularOneOffs = dailyOneOffs.filter(t => !t.is_override);
+    const overrideTransactions = dailyOneOffs.filter((t) => t.is_override);
+    const regularOneOffs = dailyOneOffs.filter((t) => !t.is_override);
 
     // 2b. Build set of rule IDs that are overridden for this day
     const overriddenRuleIds = new Set(
       overrideTransactions
-        .map(t => t.override_rule_id)
+        .map((t) => t.override_rule_id)
         .filter((id): id is string => id !== null && id !== undefined)
     );
 
     // 3. Find matching recurring rules (only active and not overridden)
-    const dailyRules = rules.filter(rule =>
-      rule.is_active &&
-      !overriddenRuleIds.has(rule.id) &&
-      matchesRecurrence(currentDate, rule)
+    const dailyRules = rules.filter(
+      (rule) =>
+        rule.is_active && !overriddenRuleIds.has(rule.id) && matchesRecurrence(currentDate, rule)
     );
 
     // 4. Combine all transactions with priority: Override > One-time > Rule
     const transactions: SimulationTransaction[] = [
-      ...overrideTransactions.map(t => ({
+      ...overrideTransactions.map((t) => ({
         name: t.description || 'Override',
         amount: t.amount,
         type: t.type,
@@ -91,13 +95,13 @@ export function runSimulation(
         ruleId: t.override_rule_id || undefined,
         isOverride: true,
       })),
-      ...regularOneOffs.map(t => ({
+      ...regularOneOffs.map((t) => ({
         name: t.description || 'One-time Transaction',
         amount: t.amount,
         type: t.type,
         source: 'one-time' as const,
       })),
-      ...dailyRules.map(r => ({
+      ...dailyRules.map((r) => ({
         name: r.name,
         amount: r.amount,
         type: r.type,
@@ -112,7 +116,7 @@ export function runSimulation(
     }, 0);
 
     // Check if this day has any override transactions
-    const hasOverride = transactions.some(t => t.source === 'override');
+    const hasOverride = transactions.some((t) => t.source === 'override');
 
     // 6. Update running balance
     runningBalance += netChange;
@@ -145,7 +149,7 @@ export function runSimulation(
  * Find the date where balance will be lowest (potential overdraft)
  */
 export function findOverdraftDate(simulationResults: DailySimulationResult[]): Date | null {
-  const negativeDay = simulationResults.find(r => r.endingBalance < 0);
+  const negativeDay = simulationResults.find((r) => r.endingBalance < 0);
   return negativeDay ? new Date(negativeDay.date) : null;
 }
 
@@ -187,14 +191,14 @@ export function getDaysUntilOverdraft(simulationResults: DailySimulationResult[]
  */
 export function getSimulationStats(simulationResults: DailySimulationResult[]) {
   const totalIncome = simulationResults.reduce(
-    (sum, r) => 
-      sum + r.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0),
+    (sum, r) =>
+      sum + r.transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0),
     0
   );
 
   const totalExpenses = simulationResults.reduce(
-    (sum, r) => 
-      sum + r.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0),
+    (sum, r) =>
+      sum + r.transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0),
     0
   );
 

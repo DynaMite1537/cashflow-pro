@@ -51,10 +51,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json([]);
   } catch (error) {
     console.error('API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -73,20 +70,14 @@ export async function POST(request: NextRequest) {
 
     // Validate amount
     if (body.amount <= 0) {
-      return NextResponse.json(
-        { error: 'Amount must be greater than 0' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Amount must be greater than 0' }, { status: 400 });
     }
 
     // Placeholder: Return success until Supabase integration
     return NextResponse.json({ message: 'Placeholder - integrate with Supabase' }, { status: 201 });
   } catch (error) {
     console.error('API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -96,20 +87,14 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     if (!body.id) {
-      return NextResponse.json(
-        { error: 'Missing payment id' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing payment id' }, { status: 400 });
     }
 
     // Placeholder: Return success until Supabase integration
     return NextResponse.json({ message: 'Placeholder - integrate with Supabase' }, { status: 200 });
   } catch (error) {
     console.error('API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -120,19 +105,13 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json(
-        { error: 'Missing payment id' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing payment id' }, { status: 400 });
     }
 
     // Placeholder: Return success until Supabase integration
     return NextResponse.json({ message: 'Placeholder - integrate with Supabase' }, { status: 200 });
   } catch (error) {
     console.error('API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

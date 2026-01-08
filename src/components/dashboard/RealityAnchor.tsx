@@ -12,7 +12,7 @@ export const RealityAnchor = memo(function RealityAnchor() {
   const currentBalance = useCurrentBalance();
   const stats = useSimulationStats();
   const { status } = useSaveStatusDisplay();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(currentBalance.toString());
   const inputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +37,7 @@ export const RealityAnchor = memo(function RealityAnchor() {
     <div className="bg-card text-card-foreground rounded-xl border border-border shadow-sm p-6 flex flex-col justify-between relative overflow-hidden group">
       {/* Edit Button */}
       <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button 
+        <button
           onClick={() => setIsEditing(true)}
           className="text-muted-foreground hover:text-primary transition-colors"
         >
@@ -63,7 +63,7 @@ export const RealityAnchor = memo(function RealityAnchor() {
                 onBlur={() => setIsEditing(false)}
                 className="text-4xl font-bold bg-transparent border-b-2 border-primary focus:outline-none w-48 font-mono"
               />
-              <button 
+              <button
                 onClick={handleSave}
                 className="bg-primary text-primary-foreground p-2 rounded-full hover:bg-primary/90"
               >
@@ -71,7 +71,7 @@ export const RealityAnchor = memo(function RealityAnchor() {
               </button>
             </div>
           ) : (
-            <span 
+            <span
               onClick={() => setIsEditing(true)}
               className="text-5xl font-bold tracking-tight cursor-pointer hover:underline decoration-dashed decoration-muted-foreground/30 underline-offset-8"
             >
@@ -100,7 +100,8 @@ export const RealityAnchor = memo(function RealityAnchor() {
               Risk Detected
             </div>
             <span className="text-sm text-muted-foreground">
-              Projected overdraft in <strong>{stats.daysUntilOverdraft} days</strong> ({stats.lowestBalanceDate})
+              Projected overdraft in <strong>{stats.daysUntilOverdraft} days</strong> (
+              {stats.lowestBalanceDate})
             </span>
           </div>
         )}

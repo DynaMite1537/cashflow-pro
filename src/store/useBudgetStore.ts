@@ -26,7 +26,9 @@ interface BudgetState {
 
   // Actions - Transactions
   setTransactions: (transactions: OneTimeTransaction[]) => void;
-  addTransaction: (transaction: Omit<OneTimeTransaction, 'id' | 'created_at' | 'updated_at'>) => void;
+  addTransaction: (
+    transaction: Omit<OneTimeTransaction, 'id' | 'created_at' | 'updated_at'>
+  ) => void;
   updateTransaction: (id: string, transaction: Partial<OneTimeTransaction>) => void;
   deleteTransaction: (id: string) => void;
 
@@ -71,113 +73,127 @@ export const useBudgetStore = create<BudgetState>()(
 
         // Rule Actions
         setRules: (rulesValue) => set({ rules: rulesValue }),
-        addRule: (rule) => set((state) => ({
-          rules: [
-            {
-              ...rule,
-              id: crypto.randomUUID(),
-              created_at: new Date(),
-              updated_at: new Date(),
-            },
-            ...state.rules,
-          ],
-        })),
-        updateRule: (id, updates) => set((state) => ({
-          rules: state.rules.map((r) =>
-            r.id === id ? { ...r, ...updates, updated_at: new Date() } : r
-          ),
-        })),
-        deleteRule: (id) => set((state) => ({
-          rules: state.rules.filter((r) => r.id !== id),
-        })),
+        addRule: (rule) =>
+          set((state) => ({
+            rules: [
+              {
+                ...rule,
+                id: crypto.randomUUID(),
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+              ...state.rules,
+            ],
+          })),
+        updateRule: (id, updates) =>
+          set((state) => ({
+            rules: state.rules.map((r) =>
+              r.id === id ? { ...r, ...updates, updated_at: new Date() } : r
+            ),
+          })),
+        deleteRule: (id) =>
+          set((state) => ({
+            rules: state.rules.filter((r) => r.id !== id),
+          })),
 
         // Transaction Actions
         setTransactions: (transactionsValue) => set({ transactions: transactionsValue }),
-        addTransaction: (transaction) => set((state) => ({
-          transactions: [
-            {
-              ...transaction,
-              id: crypto.randomUUID(),
-              created_at: new Date(),
-              updated_at: new Date(),
-            },
-            ...state.transactions,
-          ],
-        })),
-        updateTransaction: (id, updates) => set((state) => ({
-          transactions: state.transactions.map((t) =>
-            t.id === id ? { ...t, ...updates, updated_at: new Date() } : t
-          ),
-        })),
-        deleteTransaction: (id) => set((state) => ({
-          transactions: state.transactions.filter((t) => t.id !== id),
-        })),
+        addTransaction: (transaction) =>
+          set((state) => ({
+            transactions: [
+              {
+                ...transaction,
+                id: crypto.randomUUID(),
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+              ...state.transactions,
+            ],
+          })),
+        updateTransaction: (id, updates) =>
+          set((state) => ({
+            transactions: state.transactions.map((t) =>
+              t.id === id ? { ...t, ...updates, updated_at: new Date() } : t
+            ),
+          })),
+        deleteTransaction: (id) =>
+          set((state) => ({
+            transactions: state.transactions.filter((t) => t.id !== id),
+          })),
 
         // Checkpoint Actions
         setCheckpoints: (checkpointsValue) => set({ checkpoints: checkpointsValue }),
-        setCheckpoint: (date, balance) => set((state) => ({
-          checkpoints: { ...state.checkpoints, [date]: balance },
-        })),
-        removeCheckpoint: (date) => set((state) => {
-          const newCheckpoints = { ...state.checkpoints };
-          delete newCheckpoints[date];
-          return { checkpoints: newCheckpoints };
-        }),
+        setCheckpoint: (date, balance) =>
+          set((state) => ({
+            checkpoints: { ...state.checkpoints, [date]: balance },
+          })),
+        removeCheckpoint: (date) =>
+          set((state) => {
+            const newCheckpoints = { ...state.checkpoints };
+            delete newCheckpoints[date];
+            return { checkpoints: newCheckpoints };
+          }),
 
         // Save Status Actions
         setSaveStatus: (status) => set({ saveStatus: status }),
 
         // Credit Cards Actions
         setCreditCards: (cards) => set({ creditCards: cards }),
-        addCreditCard: (card) => set((state) => ({
-          creditCards: [
-            {
-              ...card,
-              id: crypto.randomUUID(),
-              created_at: new Date(),
-              updated_at: new Date(),
-            },
-            ...state.creditCards,
-          ],
-        })),
-        updateCreditCard: (id, card) => set((state) => ({
-          creditCards: state.creditCards.map((c) =>
-            c.id === id ? { ...c, ...card, updated_at: new Date() } : c
-          ),
-        })),
-        deleteCreditCard: (id) => set((state) => ({
-          creditCards: state.creditCards.filter((c) => c.id !== id),
-        })),
-
-        // Credit Card Payments Actions
-        addPayment: (payment) => set((state) => {
-          // Find the credit card and reduce its balance by payment amount
-          const updatedCreditCards = state.creditCards.map((card) =>
-            card.id === payment.cardId
-              ? { ...card, balance: card.balance - payment.amount, updated_at: new Date() }
-              : card
-          );
-
-          return {
-            creditCardPayments: [
+        addCreditCard: (card) =>
+          set((state) => ({
+            creditCards: [
               {
-                ...payment,
+                ...card,
                 id: crypto.randomUUID(),
                 created_at: new Date(),
+                updated_at: new Date(),
               },
-              ...state.creditCardPayments,
+              ...state.creditCards,
             ],
-            creditCards: updatedCreditCards,
-          };
-        }),
-        updatePayment: (id, payment) => set((state) => ({
-          creditCardPayments: state.creditCardPayments.map((p) =>
-            p.id === id ? { ...p, ...payment, updated_at: new Date() } : p
-          ),
-        })),
-        deletePayment: (id) => set((state) => ({
-          creditCardPayments: state.creditCardPayments.filter((p) => p.id !== id),
-        })),
+          })),
+        updateCreditCard: (id, card) =>
+          set((state) => ({
+            creditCards: state.creditCards.map((c) =>
+              c.id === id ? { ...c, ...card, updated_at: new Date() } : c
+            ),
+          })),
+        deleteCreditCard: (id) =>
+          set((state) => ({
+            creditCards: state.creditCards.filter((c) => c.id !== id),
+          })),
+
+        // Credit Card Payments Actions
+        addPayment: (payment) =>
+          set((state) => {
+            // Find the credit card and reduce its balance by payment amount
+            const updatedCreditCards = state.creditCards.map((card) =>
+              card.id === payment.cardId
+                ? { ...card, balance: card.balance - payment.amount, updated_at: new Date() }
+                : card
+            );
+
+            return {
+              creditCardPayments: [
+                {
+                  ...payment,
+                  id: crypto.randomUUID(),
+                  created_at: new Date(),
+                },
+                ...state.creditCardPayments,
+              ],
+              creditCards: updatedCreditCards,
+            };
+          }),
+        updatePayment: (id, payment) =>
+          set((state) => ({
+            creditCardPayments: state.creditCardPayments.map((p) =>
+              p.id === id ? { ...p, ...payment, updated_at: new Date() } : p
+            ),
+          })),
+        deletePayment: (id) =>
+          set((state) => ({
+            creditCardPayments: state.creditCardPayments.filter((p) => p.id !== id),
+          })),
 
         // Reset
         resetAll: () =>
@@ -210,10 +226,18 @@ export const useBudgetStore = create<BudgetState>()(
           // Convert date strings to Date objects in rules
           state.rules = state.rules.map((rule: BudgetRule) => ({
             ...rule,
-            start_date: rule.start_date instanceof Date ? rule.start_date : new Date(rule.start_date),
-            end_date: rule.end_date instanceof Date ? rule.end_date : (rule.end_date ? new Date(rule.end_date) : null),
-            created_at: rule.created_at instanceof Date ? rule.created_at : new Date(rule.created_at),
-            updated_at: rule.updated_at instanceof Date ? rule.updated_at : new Date(rule.updated_at),
+            start_date:
+              rule.start_date instanceof Date ? rule.start_date : new Date(rule.start_date),
+            end_date:
+              rule.end_date instanceof Date
+                ? rule.end_date
+                : rule.end_date
+                  ? new Date(rule.end_date)
+                  : null,
+            created_at:
+              rule.created_at instanceof Date ? rule.created_at : new Date(rule.created_at),
+            updated_at:
+              rule.updated_at instanceof Date ? rule.updated_at : new Date(rule.updated_at),
           }));
 
           // Convert date strings to Date objects in transactions
@@ -228,16 +252,27 @@ export const useBudgetStore = create<BudgetState>()(
           state.creditCards = state.creditCards.map((card: CreditCard) => ({
             ...card,
             dueDate: card.dueDate instanceof Date ? card.dueDate : new Date(card.dueDate),
-            created_at: card.created_at instanceof Date ? card.created_at : new Date(card.created_at),
-            updated_at: card.updated_at instanceof Date ? card.updated_at : new Date(card.updated_at),
+            created_at:
+              card.created_at instanceof Date ? card.created_at : new Date(card.created_at),
+            updated_at:
+              card.updated_at instanceof Date ? card.updated_at : new Date(card.updated_at),
           }));
 
           // Convert date strings to Date objects in payments
           state.creditCardPayments = state.creditCardPayments.map((payment: CreditCardPayment) => ({
             ...payment,
-            paymentDate: payment.paymentDate instanceof Date ? payment.paymentDate : new Date(payment.paymentDate),
-            created_at: payment.created_at instanceof Date ? payment.created_at : new Date(payment.created_at),
-            updated_at: payment.updated_at instanceof Date ? payment.updated_at : new Date(payment.updated_at),
+            paymentDate:
+              payment.paymentDate instanceof Date
+                ? payment.paymentDate
+                : new Date(payment.paymentDate),
+            created_at:
+              payment.created_at instanceof Date
+                ? payment.created_at
+                : new Date(payment.created_at),
+            updated_at:
+              payment.updated_at instanceof Date
+                ? payment.updated_at
+                : new Date(payment.updated_at),
           }));
         },
         // Handle migrations if needed
@@ -268,25 +303,27 @@ export const useCreditCards = () => useBudgetStore((state) => state.creditCards)
 export const useCreditCardPayments = () => useBudgetStore((state) => state.creditCardPayments);
 
 // Combined selectors with shallow comparison
-export const useBudgetData = () => useBudgetStore(
-  (state) => ({
-    currentBalance: state.currentBalance,
-    rules: state.rules,
-    transactions: state.transactions,
-    checkpoints: state.checkpoints,
-  }),
-  shallow
-);
+export const useBudgetData = () =>
+  useBudgetStore(
+    (state) => ({
+      currentBalance: state.currentBalance,
+      rules: state.rules,
+      transactions: state.transactions,
+      checkpoints: state.checkpoints,
+    }),
+    shallow
+  );
 
-export const useSimulationData = () => useBudgetStore(
-  (state) => ({
-    currentBalance: state.currentBalance,
-    rules: state.rules,
-    transactions: state.transactions,
-    checkpoints: state.checkpoints,
-  }),
-  shallow
-);
+export const useSimulationData = () =>
+  useBudgetStore(
+    (state) => ({
+      currentBalance: state.currentBalance,
+      rules: state.rules,
+      transactions: state.transactions,
+      checkpoints: state.checkpoints,
+    }),
+    shallow
+  );
 
 // Export store actions for non-component usage
 export const budgetActions = useBudgetStore.getState;

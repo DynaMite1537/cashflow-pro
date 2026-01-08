@@ -31,7 +31,7 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
       return;
     }
 
-    const card = creditCards.find(c => c.id === cardId);
+    const card = creditCards.find((c) => c.id === cardId);
     if (!card) {
       alert('Selected card not found');
       return;
@@ -51,13 +51,13 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
 
   const handleFullPayment = () => {
     if (!cardId) return;
-    const card = creditCards.find(c => c.id === cardId);
+    const card = creditCards.find((c) => c.id === cardId);
     if (card) {
       setAmount(card.balance.toString());
     }
   };
 
-  const activeCards = creditCards.filter(c => c.isActive);
+  const activeCards = creditCards.filter((c) => c.isActive);
 
   return (
     isOpen && (
@@ -82,7 +82,10 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
                 Select Credit Card
               </label>
               <div className="relative">
-                <CreditCardIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <CreditCardIcon
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
                 <select
                   value={cardId}
                   onChange={(e) => setCardId(e.target.value)}
@@ -92,7 +95,8 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
                   <option value="">Choose a card...</option>
                   {activeCards.map((card) => (
                     <option key={card.id} value={card.id}>
-                      {card.name} (•••• {card.last4}) - Balance: ${card.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {card.name} (•••• {card.last4}) - Balance: $
+                      {card.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </option>
                   ))}
                 </select>
@@ -110,7 +114,10 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
                 Payment Amount
               </label>
               <div className="relative">
-                <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <DollarSign
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
                 <input
                   type="number"
                   value={amount}
@@ -134,8 +141,9 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
               {cardId && amount && (
                 <div className="mt-2 text-xs">
                   <span className="text-muted-foreground">
-                    Remaining balance: ${(
-                      (creditCards.find(c => c.id === cardId)?.balance || 0) - Number(amount)
+                    Remaining balance: $
+                    {(
+                      (creditCards.find((c) => c.id === cardId)?.balance || 0) - Number(amount)
                     ).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -144,11 +152,12 @@ export function PaymentForm({ isOpen, onClose, preselectedCardId }: PaymentFormP
 
             {/* Payment Date */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Payment Date
-              </label>
+              <label className="block text-sm font-medium text-foreground mb-2">Payment Date</label>
               <div className="relative">
-                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Calendar
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
                 <input
                   type="date"
                   value={paymentDate}

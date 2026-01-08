@@ -25,8 +25,6 @@ export default function ForecastPage() {
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
 
-
-
   const handleDotClick = (date: Date) => {
     setSelectedDate(date);
   };
@@ -54,27 +52,27 @@ export default function ForecastPage() {
       {/* Enhanced Stats */}
       <ForecastStats simulation={simulation} />
 
-       {/* Chart - Recharts */}
-       <div className="bg-card border border-border rounded-xl p-8 mb-8">
-         <h2 className="text-xl font-bold mb-6">Balance Projection</h2>
-         <BalanceChart data={simulation} onDotClick={handleDotClick} />
-       </div>
+      {/* Chart - Recharts */}
+      <div className="bg-card border border-border rounded-xl p-8 mb-8">
+        <h2 className="text-xl font-bold mb-6">Balance Projection</h2>
+        <BalanceChart data={simulation} onDotClick={handleDotClick} />
+      </div>
 
-       {/* Upcoming Transactions */}
-       <UpcomingTransactions simulation={simulation} days={14} onDateClick={handleDotClick} />
+      {/* Upcoming Transactions */}
+      <UpcomingTransactions simulation={simulation} days={14} onDateClick={handleDotClick} />
 
-       {/* History Controls */}
-       <HistoryControls />
+      {/* History Controls */}
+      <HistoryControls />
 
-       {/* Day Edit Modal */}
-        {selectedDate && (
-          <DayEditModal
-            date={selectedDate}
-            events={getEventsForDate(selectedDate, transactions, rules)}
-            onClose={() => setSelectedDate(null)}
-            onBack={() => setSelectedDate(null)}
-          />
-        )}
-     </div>
-   );
- }
+      {/* Day Edit Modal */}
+      {selectedDate && (
+        <DayEditModal
+          date={selectedDate}
+          events={getEventsForDate(selectedDate, transactions, rules)}
+          onClose={() => setSelectedDate(null)}
+          onBack={() => setSelectedDate(null)}
+        />
+      )}
+    </div>
+  );
+}

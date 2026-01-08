@@ -266,7 +266,9 @@ export function BudgetRuleForm({ editingRule, onSubmit, onCancel }: BudgetRuleFo
             }`}
           />
         )}
-        {errors.recurrence_day && <p className="text-sm text-destructive">{errors.recurrence_day}</p>}
+        {errors.recurrence_day && (
+          <p className="text-sm text-destructive">{errors.recurrence_day}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -303,7 +305,9 @@ export function BudgetRuleForm({ editingRule, onSubmit, onCancel }: BudgetRuleFo
           onChange={(e) => handleChange('is_active', e.target.checked)}
           className="w-4 h-4 rounded border-border"
         />
-        <label htmlFor="is_active" className="text-sm font-medium">Active</label>
+        <label htmlFor="is_active" className="text-sm font-medium">
+          Active
+        </label>
       </div>
 
       <div className="flex gap-2 pt-4">

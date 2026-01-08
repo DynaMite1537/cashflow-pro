@@ -15,23 +15,24 @@ export function getEventsForDate(
   const dayStr = dayjs(date).format('YYYY-MM-DD');
 
   // Get all override transactions for this date
-  const overrideTransactions = transactions.filter(t =>
-    t.is_override &&
-    dayjs(t.date).format('YYYY-MM-DD') === dayStr
+  const overrideTransactions = transactions.filter(
+    (t) => t.is_override && dayjs(t.date).format('YYYY-MM-DD') === dayStr
   );
 
   // Track rule IDs that have overrides
-  const overriddenRuleIds = new Set(overrideTransactions.map(t => t.override_rule_id).filter(Boolean) as string[]);
+  const overriddenRuleIds = new Set(
+    overrideTransactions.map((t) => t.override_rule_id).filter(Boolean) as string[]
+  );
 
   // Add one-time transactions (non-override)
-  const dayTransactions = transactions.filter(t => {
+  const dayTransactions = transactions.filter((t) => {
     const tDate = new Date(t.date);
-    return !t.is_override &&
-           dayjs(date).isSame(tDate, 'month') &&
-           date.getDate() === tDate.getDate();
+    return (
+      !t.is_override && dayjs(date).isSame(tDate, 'month') && date.getDate() === tDate.getDate()
+    );
   });
 
-  dayTransactions.forEach(t => {
+  dayTransactions.forEach((t) => {
     events.push({
       type: 'transaction',
       name: t.description || 'Transaction',
@@ -42,15 +43,13 @@ export function getEventsForDate(
   });
 
   // Add matching recurring rules (only active and not overridden)
-  const matchingRules = rules.filter(rule =>
-    rule.is_active &&
-    !overriddenRuleIds.has(rule.id) &&
-    matchesRecurrence(date, rule)
+  const matchingRules = rules.filter(
+    (rule) => rule.is_active && !overriddenRuleIds.has(rule.id) && matchesRecurrence(date, rule)
   );
 
-  matchingRules.forEach(rule => {
+  matchingRules.forEach((rule) => {
     // Check if there's an override transaction for this rule
-    const overrideTx = overrideTransactions.find(ot => ot.override_rule_id === rule.id);
+    const overrideTx = overrideTransactions.find((ot) => ot.override_rule_id === rule.id);
 
     events.push({
       type: 'rule',

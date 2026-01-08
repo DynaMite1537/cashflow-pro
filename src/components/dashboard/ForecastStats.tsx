@@ -31,9 +31,7 @@ interface StatCard {
   color: 'primary' | 'success' | 'warning' | 'danger' | 'muted';
 }
 
-export const ForecastStats = memo(function ForecastStats({
-  simulation,
-}: ForecastStatsProps) {
+export const ForecastStats = memo(function ForecastStats({ simulation }: ForecastStatsProps) {
   const days = simulation.length;
 
   // Calculate statistics
@@ -43,15 +41,17 @@ export const ForecastStats = memo(function ForecastStats({
     }
 
     const totalIncome = simulation.reduce((sum, day) => {
-      return sum + day.transactions
-        .filter(t => t.type === 'income')
-        .reduce((tSum, t) => tSum + t.amount, 0);
+      return (
+        sum +
+        day.transactions.filter((t) => t.type === 'income').reduce((tSum, t) => tSum + t.amount, 0)
+      );
     }, 0);
 
     const totalExpenses = simulation.reduce((sum, day) => {
-      return sum + day.transactions
-        .filter(t => t.type === 'expense')
-        .reduce((tSum, t) => tSum + t.amount, 0);
+      return (
+        sum +
+        day.transactions.filter((t) => t.type === 'expense').reduce((tSum, t) => tSum + t.amount, 0)
+      );
     }, 0);
 
     const startBalance = simulation[0].startingBalance;
@@ -71,7 +71,7 @@ export const ForecastStats = memo(function ForecastStats({
       day.endingBalance > max.endingBalance ? day : max
     );
 
-    const negativeDays = simulation.filter(day => day.endingBalance < 0).length;
+    const negativeDays = simulation.filter((day) => day.endingBalance < 0).length;
     const hasNegative = negativeDays > 0;
 
     // Calculate average balance
@@ -114,7 +114,7 @@ export const ForecastStats = memo(function ForecastStats({
   if (!stats) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="bg-card border border-border rounded-lg p-4 animate-pulse">
             <div className="h-4 bg-muted rounded w-1/2 mb-3" />
             <div className="h-6 bg-muted rounded w-3/4 mb-2" />
@@ -239,7 +239,9 @@ export const ForecastStats = memo(function ForecastStats({
                   <div className="flex items-center gap-1 text-xs">
                     {getTrendIcon(card.trend)}
                     {card.trendValue && (
-                      <span className={card.trend === 'up' ? 'text-emerald-600' : 'text-destructive'}>
+                      <span
+                        className={card.trend === 'up' ? 'text-emerald-600' : 'text-destructive'}
+                      >
                         {card.trendValue}
                       </span>
                     )}
@@ -248,14 +250,10 @@ export const ForecastStats = memo(function ForecastStats({
               </div>
 
               {/* Value */}
-              <p className={cn('text-xl font-bold mb-1', colors.text)}>
-                {card.value}
-              </p>
+              <p className={cn('text-xl font-bold mb-1', colors.text)}>{card.value}</p>
 
               {/* Subtitle */}
-              <p className="text-xs text-muted-foreground">
-                {card.subtitle}
-              </p>
+              <p className="text-xs text-muted-foreground">{card.subtitle}</p>
             </div>
           );
         })}
@@ -285,10 +283,14 @@ export const ForecastStats = memo(function ForecastStats({
             <div className="border-t border-border/50 pt-2 mt-2">
               <div className="flex justify-between text-sm font-medium">
                 <span className="text-muted-foreground">Net Flow</span>
-                <span className={cn(
-                  'font-mono',
-                  stats.totalIncome >= stats.totalExpenses ? 'text-emerald-600' : 'text-destructive'
-                )}>
+                <span
+                  className={cn(
+                    'font-mono',
+                    stats.totalIncome >= stats.totalExpenses
+                      ? 'text-emerald-600'
+                      : 'text-destructive'
+                  )}
+                >
                   {formatCurrency(stats.totalIncome - stats.totalExpenses)}
                 </span>
               </div>
@@ -311,10 +313,12 @@ export const ForecastStats = memo(function ForecastStats({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Lowest</span>
-              <span className={cn(
-                'font-mono',
-                stats.lowestPoint.endingBalance < 0 ? 'text-destructive' : 'text-foreground'
-              )}>
+              <span
+                className={cn(
+                  'font-mono',
+                  stats.lowestPoint.endingBalance < 0 ? 'text-destructive' : 'text-foreground'
+                )}
+              >
                 {formatCurrency(stats.lowestPoint.endingBalance)}
               </span>
             </div>

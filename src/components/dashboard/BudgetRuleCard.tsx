@@ -1,10 +1,20 @@
 'use client';
 
 import { memo } from 'react';
-import { Pencil, Trash2, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, ToggleLeft, ToggleRight } from 'lucide-react';
+import {
+  Pencil,
+  Trash2,
+  Calendar,
+  DollarSign,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  ToggleLeft,
+  ToggleRight,
+} from 'lucide-react';
 import { BudgetRule } from '@/types';
 import { formatCurrency, getFrequencyLabel } from '@/lib/dateUtils';
 import { cn } from '@/lib/utils';
+import { CATEGORY_COLOR_CLASSES } from '@/lib/constants';
 
 interface BudgetRuleCardProps {
   rule: BudgetRule;
@@ -13,47 +23,44 @@ interface BudgetRuleCardProps {
   onToggleActive: () => void;
 }
 
-export const BudgetRuleCard = memo(function BudgetRuleCard({ rule, onEdit, onDelete, onToggleActive }: BudgetRuleCardProps) {
+export const BudgetRuleCard = memo(function BudgetRuleCard({
+  rule,
+  onEdit,
+  onDelete,
+  onToggleActive,
+}: BudgetRuleCardProps) {
   const isIncome = rule.type === 'income';
-  const categoryColors: Record<string, string> = {
-    housing: 'bg-[hsl(var(--category-housing))]/10 text-[hsl(var(--category-housing))] border-[hsl(var(--category-housing))/20]',
-    transport: 'bg-[hsl(var(--category-transport))]/10 text-[hsl(var(--category-transport))] border-[hsl(var(--category-transport))/20]',
-    utilities: 'bg-[hsl(var(--category-utilities))]/10 text-[hsl(var(--category-utilities))] border-[hsl(var(--category-utilities))/20]',
-    food: 'bg-[hsl(var(--category-food))]/10 text-[hsl(var(--category-food))] border-[hsl(var(--category-food))/20]',
-    entertainment: 'bg-[hsl(var(--category-entertainment))]/10 text-[hsl(var(--category-entertainment))] border-[hsl(var(--category-entertainment))/20]',
-    debt: 'bg-[hsl(var(--category-debt))]/10 text-[hsl(var(--category-debt))] border-[hsl(var(--category-debt))/20]',
-    subscription: 'bg-[hsl(var(--category-subscription))]/10 text-[hsl(var(--category-subscription))] border-[hsl(var(--category-subscription))/20]',
-    other: 'bg-[hsl(var(--category-other))]/10 text-[hsl(var(--category-other))] border-[hsl(var(--category-other))/20]',
-  };
 
   return (
-    <div className={cn(
-      'bg-card border rounded-lg p-5 hover:shadow-md transition-all relative group',
-      !rule.is_active && 'opacity-60 grayscale-[50%]'
-    )}>
+    <div
+      className={cn(
+        'bg-card border rounded-lg p-5 hover:shadow-md transition-all relative group',
+        !rule.is_active && 'opacity-60 grayscale-[50%]'
+      )}
+    >
       {/* Active Badge */}
       <div className="absolute top-3 right-3">
         <button
           onClick={onToggleActive}
           className={cn(
             'p-1.5 rounded-full transition-colors',
-            rule.is_active ? 'text-emerald-600 hover:bg-emerald-500/10' : 'text-muted-foreground hover:bg-muted'
+            rule.is_active
+              ? 'text-emerald-600 hover:bg-emerald-500/10'
+              : 'text-muted-foreground hover:bg-muted'
           )}
           title={rule.is_active ? 'Active' : 'Inactive'}
         >
-          {rule.is_active ? (
-            <ToggleRight size={18} />
-          ) : (
-            <ToggleLeft size={18} />
-          )}
+          {rule.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
         </button>
       </div>
 
       {/* Type Icon */}
-      <div className={cn(
-        'w-10 h-10 rounded-lg flex items-center justify-center mb-3',
-        isIncome ? 'bg-emerald-500/10' : 'bg-destructive/10'
-      )}>
+      <div
+        className={cn(
+          'w-10 h-10 rounded-lg flex items-center justify-center mb-3',
+          isIncome ? 'bg-emerald-500/10' : 'bg-destructive/10'
+        )}
+      >
         {isIncome ? (
           <ArrowUpCircle className="h-5 w-5 text-emerald-600" />
         ) : (
@@ -71,10 +78,12 @@ export const BudgetRuleCard = memo(function BudgetRuleCard({ rule, onEdit, onDel
               {rule.end_date && ` • Ends ${new Date(rule.end_date).toLocaleDateString()}`}
             </p>
           </div>
-          <div className={cn(
-            'px-2.5 py-1 rounded-full text-xs font-medium border',
-            categoryColors[rule.category]
-          )}>
+          <div
+            className={cn(
+              'px-2.5 py-1 rounded-full text-xs font-medium border',
+              CATEGORY_COLOR_CLASSES[rule.category]
+            )}
+          >
             {rule.category}
           </div>
         </div>
@@ -88,9 +97,11 @@ export const BudgetRuleCard = memo(function BudgetRuleCard({ rule, onEdit, onDel
         <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
           <Calendar size={16} />
           {rule.frequency === 'monthly' && `Day ${rule.recurrence_day}`}
-          {rule.frequency === 'weekly' && ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(rule.recurrence_day || 0) % 7]}
+          {rule.frequency === 'weekly' &&
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(rule.recurrence_day || 0) % 7]}
           {rule.frequency === 'bi-weekly' && 'Every 2 weeks'}
-          {rule.frequency === 'yearly' && `Annually (${new Date(rule.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })})`}
+          {rule.frequency === 'yearly' &&
+            `Annually (${new Date(rule.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })})`}
         </div>
       </div>
 

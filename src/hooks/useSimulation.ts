@@ -37,13 +37,7 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
 
   // Memoize simulation calculation - only re-run when dependencies change
   const simulation = useMemo(() => {
-    return runSimulation(
-      currentBalance,
-      rules,
-      transactions,
-      checkpointMap,
-      daysToProject
-    );
+    return runSimulation(currentBalance, rules, transactions, checkpointMap, daysToProject);
   }, [currentBalance, rules, transactions, checkpointMap, daysToProject]);
 
   // Memoize stats calculation - only re-run when simulation changes

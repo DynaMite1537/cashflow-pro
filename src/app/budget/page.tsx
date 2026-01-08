@@ -36,8 +36,7 @@ export default function BudgetPage() {
     .filter((rule) => {
       if (!debouncedSearchQuery) return true;
       const query = debouncedSearchQuery.toLowerCase();
-      return rule.name.toLowerCase().includes(query) ||
-             rule.category.toLowerCase().includes(query);
+      return rule.name.toLowerCase().includes(query) || rule.category.toLowerCase().includes(query);
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -61,9 +60,9 @@ export default function BudgetPage() {
   const toMonthlyAmount = (amount: number, frequency: string) => {
     switch (frequency) {
       case 'weekly':
-        return amount * 52 / 12; // 52 weeks per year / 12 months
+        return (amount * 52) / 12; // 52 weeks per year / 12 months
       case 'bi-weekly':
-        return amount * 26 / 12; // 26 bi-weekly periods per year / 12 months
+        return (amount * 26) / 12; // 26 bi-weekly periods per year / 12 months
       case 'monthly':
         return amount;
       case 'yearly':
@@ -75,10 +74,10 @@ export default function BudgetPage() {
 
   // Stats (always calculate from active rules only, regardless of current filter)
   const activeIncome = rules
-    .filter(r => r.type === 'income' && r.is_active)
+    .filter((r) => r.type === 'income' && r.is_active)
     .reduce((sum, r) => sum + toMonthlyAmount(r.amount, r.frequency), 0);
   const activeExpenses = rules
-    .filter(r => r.type === 'expense' && r.is_active)
+    .filter((r) => r.type === 'expense' && r.is_active)
     .reduce((sum, r) => sum + toMonthlyAmount(r.amount, r.frequency), 0);
   const monthlyNet = activeIncome - activeExpenses;
 
@@ -119,9 +118,7 @@ export default function BudgetPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Budget Rules</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your recurring income and expenses
-          </p>
+          <p className="text-muted-foreground mt-1">Manage your recurring income and expenses</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -140,7 +137,11 @@ export default function BudgetPage() {
             <p className="text-sm text-muted-foreground">Monthly Income</p>
           </div>
           <p className="text-2xl font-bold text-emerald-600">
-            ${activeIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            $
+            {activeIncome.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
         <div className="bg-card border border-border rounded-lg p-4">
@@ -149,7 +150,11 @@ export default function BudgetPage() {
             <p className="text-sm text-muted-foreground">Monthly Expenses</p>
           </div>
           <p className="text-2xl font-bold text-destructive">
-            ${activeExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            $
+            {activeExpenses.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
         <div className="bg-card border border-border rounded-lg p-4">
@@ -161,9 +166,14 @@ export default function BudgetPage() {
             )}
             <p className="text-sm text-muted-foreground">Net Monthly</p>
           </div>
-          <p className={`text-2xl font-bold ${monthlyNet >= 0 ? 'text-foreground' : 'text-destructive'}`}>
-            {monthlyNet >= 0 ? '+' : ''}
-            ${Math.abs(monthlyNet).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <p
+            className={`text-2xl font-bold ${monthlyNet >= 0 ? 'text-foreground' : 'text-destructive'}`}
+          >
+            {monthlyNet >= 0 ? '+' : ''}$
+            {Math.abs(monthlyNet).toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
       </div>
@@ -250,7 +260,9 @@ export default function BudgetPage() {
                 {editingRule ? 'Edit Budget Rule' : 'Create New Budget Rule'}
               </h3>
               <p className="text-muted-foreground text-sm mb-6">
-                {editingRule ? 'Update your recurring income or expense' : 'Set up a recurring income or expense'}
+                {editingRule
+                  ? 'Update your recurring income or expense'
+                  : 'Set up a recurring income or expense'}
               </p>
 
               <BudgetRuleForm

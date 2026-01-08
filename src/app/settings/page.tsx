@@ -9,7 +9,8 @@ import { parseExcelData, validateImportResult } from '@/lib/importData';
 import { useBudgetStore } from '@/store/useBudgetStore';
 
 export default function SettingsPage() {
-  const { rules, transactions, currentBalance, addRule, addTransaction, resetAll } = useBudgetStore();
+  const { rules, transactions, currentBalance, addRule, addTransaction, resetAll } =
+    useBudgetStore();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [exporting, setExporting] = useState(false);
   const [clearing, setClearing] = useState(false);
@@ -68,10 +69,10 @@ export default function SettingsPage() {
       try {
         // Clear local storage
         localStorage.removeItem('cashflow-storage');
-        
+
         // Reset store
         resetAll();
-        
+
         toastSuccess('Data cleared', 'All data has been removed');
       } catch (error) {
         console.error('Clear failed:', error);
@@ -93,7 +94,7 @@ export default function SettingsPage() {
     setExporting(true);
     try {
       const result = await parseExcelData(file);
-      
+
       // Validate import
       const validation = validateImportResult(result);
       if (!validation.valid) {
@@ -102,7 +103,7 @@ export default function SettingsPage() {
       }
 
       // Add imported data to store
-      result.rules.forEach(rule => {
+      result.rules.forEach((rule) => {
         addRule({
           name: rule.name,
           amount: rule.amount,
@@ -116,7 +117,7 @@ export default function SettingsPage() {
         });
       });
 
-      result.transactions.forEach(transaction => {
+      result.transactions.forEach((transaction) => {
         addTransaction({
           date: new Date(transaction.date),
           description: transaction.description || null,
@@ -126,7 +127,10 @@ export default function SettingsPage() {
         });
       });
 
-      toastSuccess('Import successful', `Added ${result.rules.length} rules and ${result.transactions.length} transactions`);
+      toastSuccess(
+        'Import successful',
+        `Added ${result.rules.length} rules and ${result.transactions.length} transactions`
+      );
     } catch (error) {
       console.error('Import failed:', error);
       toastError('Import failed', 'Unable to parse file. Please check the format.');
@@ -174,10 +178,10 @@ export default function SettingsPage() {
         <div className="divide-y divide-border">
           <div className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
             <div className="flex-1">
-              <p className="font-medium text-sm">{theme === 'light' ? 'Light Mode' : 'Dark Mode'}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Currently using {theme} theme
+              <p className="font-medium text-sm">
+                {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
               </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Currently using {theme} theme</p>
             </div>
             <button
               onClick={toggleTheme}
@@ -245,9 +249,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
             <div className="flex-1">
               <p className="font-medium text-sm">Load Sample Data</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Populate app with demo data
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Populate app with demo data</p>
             </div>
             <button
               onClick={handleLoadSampleData}
@@ -297,9 +299,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
             <div className="flex-1">
               <p className="font-medium text-sm">Sign Out</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Sign out of your account
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Sign out of your account</p>
             </div>
             <button
               onClick={handleSignOut}
@@ -327,7 +327,11 @@ export default function SettingsPage() {
           <div>
             <p className="text-sm text-muted-foreground">Current Balance</p>
             <p className="text-2xl font-bold font-mono">
-              ${currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              $
+              {currentBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </div>
         </div>

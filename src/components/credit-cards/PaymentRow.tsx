@@ -59,9 +59,7 @@ export function PaymentRow({
 
         {/* Notes */}
         <div className="flex-[2] min-w-[200px]">
-          <p className="text-sm text-muted-foreground truncate">
-            {payment.notes || '-'}
-          </p>
+          <p className="text-sm text-muted-foreground truncate">{payment.notes || '-'}</p>
         </div>
 
         {/* Actions */}

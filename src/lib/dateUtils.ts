@@ -87,11 +87,7 @@ function matchesYearly(targetDate: Date, startDate: Date): boolean {
 /**
  * Get all occurrence dates for a rule within a date range
  */
-export function getOccurrencesInRange(
-  rule: BudgetRule,
-  rangeStart: Date,
-  rangeEnd: Date
-): Date[] {
+export function getOccurrencesInRange(rule: BudgetRule, rangeStart: Date, rangeEnd: Date): Date[] {
   const occurrences: Date[] = [];
   let currentDate = new Date(Math.max(rule.start_date.getTime(), rangeStart.getTime()));
 
@@ -161,7 +157,10 @@ export function getFrequencyLabel(frequency: Frequency): string {
 /**
  * Format amount with +/- sign and color info
  */
-export function formatTransactionAmount(amount: number, type: 'income' | 'expense'): {
+export function formatTransactionAmount(
+  amount: number,
+  type: 'income' | 'expense'
+): {
   text: string;
   isPositive: boolean;
 } {
