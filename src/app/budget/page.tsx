@@ -9,6 +9,7 @@ import { NoRules } from '@/components/ui/EmptyState';
 import { BudgetRuleForm } from '@/components/dashboard/BudgetRuleForm';
 import { BudgetRule, BudgetRuleInput } from '@/types';
 import { useDebounce } from 'use-debounce';
+import { DEBOUNCE_DELAY } from '@/lib/constants';
 
 type FilterType = 'all' | 'income' | 'expense' | 'active' | 'inactive';
 type SortType = 'name-asc' | 'name-desc' | 'amount-asc' | 'amount-desc' | 'date-asc' | 'date-desc';
@@ -22,7 +23,7 @@ export default function BudgetPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Debounce search query to avoid unnecessary re-renders
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
   // Filter rules
   const filteredRules = rules

@@ -10,11 +10,10 @@ import { cn } from '@/lib/utils';
 import { TransactionRow, TransactionRowDataProps } from '@/components/transactions/TransactionRow';
 import { List } from 'react-window';
 import { useDebounce } from 'use-debounce';
+import { ITEMS_PER_PAGE, DEBOUNCE_DELAY } from '@/lib/constants';
 
 type SortField = 'date' | 'amount' | 'description';
 type SortOrder = 'asc' | 'desc';
-
-const ITEMS_PER_PAGE = 25;
 
 export default function TransactionsPage() {
   const { transactions, deleteTransaction, updateTransaction } = useBudgetStore();
@@ -25,7 +24,7 @@ export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Debounce search query to avoid unnecessary re-renders
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
   // Filter and sort transactions
   const filteredTransactions = transactions

@@ -3,19 +3,7 @@ import { shallow } from 'zustand/shallow';
 import { temporal } from 'zundo';
 import { persist } from 'zustand/middleware';
 import { BudgetRule, OneTimeTransaction, SaveStatus, CreditCard, CreditCardPayment } from '@/types';
-
-// Helper to revive dates from JSON
-const reviver = (key: string, value: any) => {
-  if (key === 'start_date' || key === 'end_date' || key === 'date' || key === 'created_at' || key === 'updated_at') {
-    if (typeof value === 'string' || typeof value === 'number') {
-      const date = new Date(value);
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-  }
-  return value;
-};
+import { STORAGE_KEY, STORAGE_VERSION, UNDO_HISTORY_LIMIT } from '@/lib/constants';
 
 interface BudgetState {
   // State
@@ -162,19 +150,29 @@ export const useBudgetStore = create<BudgetState>()(
         })),
 
         // Credit Card Payments Actions
-        addPayment: (payment) => set((state) => ({
-          creditCardPayments: [
-            {
-              ...payment,
-              id: crypto.randomUUID(),
-              created_at: new Date(),
-            },
-            ...state.creditCardPayments,
-          ],
-        })),
+        addPayment: (payment) => set((state) => {
+          // Find the credit card and reduce its balance by payment amount
+          const updatedCreditCards = state.creditCards.map((card) =>
+            card.id === payment.cardId
+              ? { ...card, balance: card.balance - payment.amount, updated_at: new Date() }
+              : card
+          );
+
+          return {
+            creditCardPayments: [
+              {
+                ...payment,
+                id: crypto.randomUUID(),
+                created_at: new Date(),
+              },
+              ...state.creditCardPayments,
+            ],
+            creditCards: updatedCreditCards,
+          };
+        }),
         updatePayment: (id, payment) => set((state) => ({
           creditCardPayments: state.creditCardPayments.map((p) =>
-            p.id === id ? { ...payment, ...p } : p
+            p.id === id ? { ...p, ...payment, updated_at: new Date() } : p
           ),
         })),
         deletePayment: (id) => set((state) => ({
@@ -194,8 +192,8 @@ export const useBudgetStore = create<BudgetState>()(
           }),
       }),
       {
-        name: 'cashflow-storage',
-        version: 1,
+        name: STORAGE_KEY,
+        version: STORAGE_VERSION,
         // Persist only data, not save status
         partialize: (state) => ({
           currentBalance: state.currentBalance,
@@ -253,7 +251,7 @@ export const useBudgetStore = create<BudgetState>()(
       }
     ),
     {
-      limit: 50, // Remember last 50 actions
+      limit: UNDO_HISTORY_LIMIT, // Remember last N actions
     }
   )
 );

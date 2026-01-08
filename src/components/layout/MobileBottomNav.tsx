@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Calendar, DollarSign, Settings, ChevronUp } from 'lucide-react';
+import { Home, Calendar, DollarSign, Settings, ChevronUp, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -13,6 +13,7 @@ export function MobileBottomNav() {
     { id: 'forecast', label: 'Forecast', icon: Home, href: '/forecast' },
     { id: 'calendar', label: 'Calendar', icon: Calendar, href: '/calendar' },
     { id: 'budget', label: 'Budget', icon: DollarSign, href: '/budget' },
+    { id: 'credit-cards', label: 'Cards', icon: CreditCard, href: '/credit-cards' },
     { id: 'settings', label: 'Settings', icon: Settings, href: '/settings' },
   ];
 

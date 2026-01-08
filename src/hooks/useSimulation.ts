@@ -2,6 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { runSimulation, getSimulationStats } from '@/lib/simulation';
 import { DailySimulationResult } from '@/types';
+import { DEFAULT_DAYS_TO_PROJECT } from '@/lib/constants';
 
 interface UseSimulationOptions {
   daysToProject?: number;
@@ -23,7 +24,7 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
   const rules = useBudgetStore((state) => state.rules);
   const transactions = useBudgetStore((state) => state.transactions);
   const checkpoints = useBudgetStore((state) => state.checkpoints);
-  const { daysToProject = 90 } = options;
+  const { daysToProject = DEFAULT_DAYS_TO_PROJECT } = options;
 
   // Memoize checkpoint conversion - only re-run when checkpoints change
   const checkpointMap = useMemo(() => {

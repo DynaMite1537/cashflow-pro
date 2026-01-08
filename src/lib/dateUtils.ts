@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { BudgetRule, Frequency } from '@/types';
+import { FREQUENCY_LABELS } from '@/lib/constants';
 
 /**
  * Check if a date matches a recurring rule
@@ -154,13 +155,7 @@ export function toISODate(date: Date): string {
  * Get frequency display label
  */
 export function getFrequencyLabel(frequency: Frequency): string {
-  const labels: Record<Frequency, string> = {
-    weekly: 'Weekly',
-    'bi-weekly': 'Bi-weekly',
-    monthly: 'Monthly',
-    yearly: 'Yearly',
-  };
-  return labels[frequency];
+  return FREQUENCY_LABELS[frequency];
 }
 
 /**
