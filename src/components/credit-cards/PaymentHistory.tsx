@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, Filter, ArrowUpDown } from 'lucide-react';
+import { Filter, ArrowUpDown } from 'lucide-react';
 import { CreditCardPayment, CreditCard } from '@/types';
 import { useBudgetStore } from '@/store/useBudgetStore';
+import { List } from 'react-window';
+import { PaymentRow, PaymentRowDataProps } from './PaymentRow';
 
 interface PaymentHistoryProps {
   onEditPayment?: (payment: CreditCardPayment) => void;
@@ -92,74 +94,39 @@ export function PaymentHistory({ onEditPayment }: PaymentHistoryProps) {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-muted">
-            <tr>
-              <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Date
-              </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Card
-              </th>
-              <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Amount
-              </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Notes
-              </th>
-              <th className="w-16"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {sortedPayments.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                  <p className="text-sm">No payment history found</p>
-                  <p className="text-xs mt-1">Record your first payment to see it here</p>
-                </td>
-              </tr>
-            ) : (
-              sortedPayments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-muted/50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-foreground whitespace-nowrap">
-                    {formatDate(payment.paymentDate)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: getCardColor(payment.cardId) }}
-                      />
-                      <span className="text-sm text-foreground">{getCardName(payment.cardId)}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="text-sm font-medium text-green-600">
-                      -{formatCurrency(payment.amount)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm text-muted-foreground max-w-xs truncate">
-                      {payment.notes || '-'}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => handleDelete(payment.id, payment.amount, payment.cardId)}
-                      className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-                      title="Delete payment"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Table Header */}
+      <div className="bg-muted px-6 py-3 border-b border-border flex items-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="flex-1 min-w-[120px]">Date</div>
+        <div className="flex-1 min-w-[150px]">Card</div>
+        <div className="flex-1 min-w-[100px] text-right">Amount</div>
+        <div className="flex-[2] min-w-[200px]">Notes</div>
+        <div className="w-16"></div>
       </div>
+
+      {/* Virtualized List */}
+      {sortedPayments.length === 0 ? (
+        <div className="px-6 py-12 text-center text-muted-foreground">
+          <p className="text-sm">No payment history found</p>
+          <p className="text-xs mt-1">Record your first payment to see it here</p>
+        </div>
+      ) : (
+        <List<PaymentRowDataProps>
+          rowComponent={PaymentRow}
+          rowCount={sortedPayments.length}
+          rowHeight={72}
+          rowProps={{
+            payments: sortedPayments,
+            creditCards,
+            getCardName,
+            getCardColor,
+            formatCurrency,
+            formatDate,
+            onDelete: handleDelete,
+            onEditPayment,
+          }}
+          style={{ height: Math.min(sortedPayments.length * 72, 600) }}
+        />
+      )}
 
       {/* Total paid */}
       {sortedPayments.length > 0 && (

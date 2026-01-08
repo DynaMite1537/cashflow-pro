@@ -5,19 +5,10 @@ import dayjs from 'dayjs';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Repeat, Pencil, Edit3, AlertCircle } from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { matchesRecurrence } from '@/lib/dateUtils';
+import { getEventsForDate } from '@/lib/calendarUtils';
+import { CalendarEvent } from '@/types';
 import { cn } from '@/lib/utils';
 import { DayEditModal } from '@/components/dashboard/DayEditModal';
-
-interface CalendarEvent {
-  type: 'transaction' | 'rule';
-  name: string;
-  amount: number;
-  transactionType: 'income' | 'expense';
-  id: string;
-  ruleId?: string;
-  isOverride?: boolean;
-  originalAmount?: number;
-}
 
 // Custom Tooltip Component
 function EventTooltip({ event, children }: {
@@ -195,75 +186,6 @@ export default function CalendarPage() {
     return days;
   }, [monthStart, monthEnd]);
 
-  // Get all events for a specific date (one-time transactions + recurring rules)
-  const getEventsForDate = (date: Date): CalendarEvent[] => {
-    const events: CalendarEvent[] = [];
-    const dayStr = dayjs(date).format('YYYY-MM-DD');
-
-    // Get all override transactions for this date
-    const overrideTransactions = transactions.filter(t =>
-      t.is_override &&
-      dayjs(t.date).format('YYYY-MM-DD') === dayStr
-    );
-
-    // Track rule IDs that have overrides
-    const overriddenRuleIds = new Set(overrideTransactions.map(t => t.override_rule_id).filter(Boolean) as string[]);
-
-    // Add one-time transactions (non-override)
-    const dayTransactions = transactions.filter(t => {
-      const tDate = new Date(t.date);
-      return !t.is_override &&
-             dayjs(date).isSame(tDate, 'month') &&
-             date.getDate() === tDate.getDate();
-    });
-
-    dayTransactions.forEach(t => {
-      events.push({
-        type: 'transaction',
-        name: t.description || 'Transaction',
-        amount: t.amount,
-        transactionType: t.type,
-        id: t.id,
-      });
-    });
-
-    // Add matching recurring rules (only active and not overridden)
-    const matchingRules = rules.filter(rule =>
-      rule.is_active &&
-      !overriddenRuleIds.has(rule.id) &&
-      matchesRecurrence(date, rule)
-    );
-
-    matchingRules.forEach(rule => {
-      events.push({
-        type: 'rule',
-        name: rule.name,
-        amount: rule.amount,
-        transactionType: rule.type,
-        id: rule.id,
-      });
-    });
-
-    // Add override transactions (replacing rules they override)
-    overrideTransactions.forEach(t => {
-      if (t.override_rule_id) {
-        const rule = rules.find(r => r.id === t.override_rule_id);
-        events.push({
-          type: 'rule',
-          name: t.description || (rule?.name || 'Override'),
-          amount: t.amount,
-          transactionType: t.type,
-          id: t.id,
-          ruleId: t.override_rule_id,
-          isOverride: true,
-          originalAmount: rule?.amount,
-        });
-      }
-    });
-
-    return events;
-  };
-
   // Check if a date has overrides
   const hasOverride = (date: Date): boolean => {
     const dayStr = dayjs(date).format('YYYY-MM-DD');
@@ -354,7 +276,7 @@ export default function CalendarPage() {
 
           {/* Actual days */}
           {daysInMonth.map((day) => {
-            const dayEvents = getEventsForDate(day);
+            const dayEvents = getEventsForDate(day, transactions, rules);
             const isToday = dayjs(day).isSame(new Date(), 'day');
             const isWeekend = day.getDay() === 0 || day.getDay() === 6;
             const dayHasOverride = hasOverride(day);
@@ -474,7 +396,7 @@ export default function CalendarPage() {
       {selectedDate && (
         <DayEditModal
           date={selectedDate}
-          events={getEventsForDate(selectedDate)}
+          events={getEventsForDate(selectedDate, transactions, rules)}
           onClose={() => setSelectedDate(null)}
         />
       )}

@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, Filter, ArrowDownCircle, ArrowUpCircle, Trash2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useBudgetStore } from '@/store/useBudgetStore';
 import { toastSuccess, toastError } from '@/lib/toast';
 import { formatCurrency } from '@/lib/dateUtils';
 import { NoTransactions } from '@/components/ui/EmptyState';
 import { cn } from '@/lib/utils';
+import { TransactionRow, TransactionRowDataProps } from '@/components/transactions/TransactionRow';
+import { List } from 'react-window';
+import { useDebounce } from 'use-debounce';
 
 type SortField = 'date' | 'amount' | 'description';
 type SortOrder = 'asc' | 'desc';
@@ -21,11 +24,14 @@ export default function TransactionsPage() {
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Debounce search query to avoid unnecessary re-renders
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+
   // Filter and sort transactions
   const filteredTransactions = transactions
     .filter((t) => {
       if (filterType !== 'all' && t.type !== filterType) return false;
-      const query = searchQuery.toLowerCase();
+      const query = debouncedSearchQuery.toLowerCase();
       return t.description?.toLowerCase().includes(query) || false;
     })
     .sort((a, b) => {
@@ -189,84 +195,17 @@ export default function TransactionsPage() {
       {/* Transactions List */}
       {paginatedTransactions.length > 0 ? (
         <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <div className="divide-y divide-border">
-            {paginatedTransactions.map((transaction) => {
-              const isIncome = transaction.type === 'income';
-              return (
-                <div
-                  key={transaction.id}
-                  className={cn(
-                    'flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors group',
-                    !transaction.is_reconciled && 'opacity-70'
-                  )}
-                >
-                  {/* Type Icon */}
-                  <div className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center',
-                    isIncome ? 'bg-emerald-500/10' : 'bg-destructive/10'
-                  )}>
-                    {isIncome ? (
-                      <ArrowUpCircle className="h-5 w-5 text-emerald-600" />
-                    ) : (
-                      <ArrowDownCircle className="h-5 w-5 text-destructive" />
-                    )}
-                  </div>
-
-                  {/* Details */}
-                  <div className="flex-1 min-w-0">
-                    <p className={cn(
-                      'font-medium truncate text-sm',
-                      isIncome ? 'text-foreground' : 'text-foreground'
-                    )}>
-                      {transaction.description || 'No description'}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Calendar size={14} className="text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(transaction.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </span>
-                      {transaction.is_reconciled && (
-                        <span className="text-xs text-muted-foreground">• Reconciled</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="text-right">
-                    <p className={cn(
-                      'text-lg font-bold font-mono',
-                      isIncome ? 'text-emerald-600' : 'text-destructive'
-                    )}>
-                      {isIncome ? '+' : '-'}
-                      {formatCurrency(transaction.amount)}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleToggleReconciled(transaction.id, transaction.is_reconciled)}
-                      className="p-2 hover:bg-accent rounded transition-colors"
-                      title="Toggle reconciled status"
-                    >
-                      <Calendar size={16} className="text-muted-foreground" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(transaction.id, transaction.description)}
-                      className="p-2 hover:bg-destructive/10 rounded transition-colors text-destructive"
-                      title="Delete transaction"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <List<TransactionRowDataProps>
+            rowComponent={TransactionRow}
+            rowCount={paginatedTransactions.length}
+            rowHeight={70}
+            rowProps={{
+              transactions: paginatedTransactions,
+              onDelete: handleDelete,
+              onToggleReconciled: handleToggleReconciled,
+            }}
+            style={{ height: 600 }}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (

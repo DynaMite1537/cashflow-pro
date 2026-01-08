@@ -8,6 +8,7 @@ import { BudgetRuleCard } from '@/components/dashboard/BudgetRuleCard';
 import { NoRules } from '@/components/ui/EmptyState';
 import { BudgetRuleForm } from '@/components/dashboard/BudgetRuleForm';
 import { BudgetRule, BudgetRuleInput } from '@/types';
+import { useDebounce } from 'use-debounce';
 
 type FilterType = 'all' | 'income' | 'expense' | 'active' | 'inactive';
 type SortType = 'name-asc' | 'name-desc' | 'amount-asc' | 'amount-desc' | 'date-asc' | 'date-desc';
@@ -20,6 +21,9 @@ export default function BudgetPage() {
   const [editingRule, setEditingRule] = useState<BudgetRule | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Debounce search query to avoid unnecessary re-renders
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+
   // Filter rules
   const filteredRules = rules
     .filter((rule) => {
@@ -29,8 +33,8 @@ export default function BudgetPage() {
       return rule.type === filter;
     })
     .filter((rule) => {
-      if (!searchQuery) return true;
-      const query = searchQuery.toLowerCase();
+      if (!debouncedSearchQuery) return true;
+      const query = debouncedSearchQuery.toLowerCase();
       return rule.name.toLowerCase().includes(query) ||
              rule.category.toLowerCase().includes(query);
     })

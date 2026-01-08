@@ -151,3 +151,15 @@ export interface CreditCardPayment {
 
 export type CreditCardPaymentInput = Omit<CreditCardPayment, 'id' | 'created_at'>;
 
+// ============== Calendar Event Types ==============
+export interface CalendarEvent {
+  type: 'transaction' | 'rule';
+  name: string;
+  amount: number;
+  transactionType: 'income' | 'expense';
+  id: string;
+  ruleId?: string;
+  isOverride?: boolean;
+  originalAmount?: number;
+}
+
