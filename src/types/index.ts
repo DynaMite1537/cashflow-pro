@@ -121,3 +121,33 @@ export interface AppState {
 export interface FilterType {
   type: 'all' | 'income' | 'expense' | 'active' | 'inactive';
 }
+
+// ============== Credit Card Types ==============
+export interface CreditCard {
+  id: string;
+  name: string;              // "Chase Sapphire", "Amex Gold"
+  last4: string;             // Last 4 digits: "1234"
+  balance: number;              // Current balance owed
+  limit: number;               // Credit limit
+  dueDate: Date;              // Specific next due date
+  color?: string;              // Card identification color
+  annualFee?: number;           // Optional annual fee
+  isActive: boolean;            // Toggle tracking on/off
+  created_at: Date;
+  updated_at: Date;
+}
+
+export type CreditCardInput = Omit<CreditCard, 'id' | 'created_at' | 'updated_at'>;
+
+export interface CreditCardPayment {
+  id: string;
+  cardId: string;
+  amount: number;
+  paymentDate: Date;
+  notes?: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export type CreditCardPaymentInput = Omit<CreditCardPayment, 'id' | 'created_at'>;
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { Wallet, LineChart, Calendar, Settings, LogOut } from 'lucide-react';
+import { Wallet, LineChart, Calendar, Settings, LogOut, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
@@ -14,6 +14,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     { id: 'forecast', label: 'Forecast', icon: LineChart, href: '/forecast' },
     { id: 'calendar', label: 'Calendar', icon: Calendar, href: '/calendar' },
     { id: 'budget', label: 'Budget Rules', icon: Wallet, href: '/budget' },
+    { id: 'credit-cards', label: 'Credit Cards', icon: CreditCard, href: '/credit-cards' },
   ];
 
   return (
